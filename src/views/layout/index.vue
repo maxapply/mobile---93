@@ -15,7 +15,13 @@
       <router-view></router-view>
     </div>
 
-    <!-- 公共脚步 -->
+    <!-- 公共脚步
+      van-tabbar:标签栏组件
+      van-tabbar: route  激活路由功能
+      van-tabbar-item
+        to: 请求路由地址
+        icon：标签栏项目显示的图标，icon图标库在组件库中可以看到
+    -->
     <van-tabbar route>
       <van-tabbar-item to="/home" icon="home-o">首页</van-tabbar-item>
       <van-tabbar-item to="/question"  icon="chat-o">问答</van-tabbar-item>
