@@ -7,6 +7,9 @@ import store from './store'
 import Vant from 'vant'
 // vant的样式导入
 import 'vant/lib/index.css'
+// rem适配基准值 相关依赖包导入
+import 'amfe-flexible/index.min.js'
+
 // vant的注册
 // 本质：全局方式注册了n多的组件和全局成员
 //       Vue.component(xx,function(){})
