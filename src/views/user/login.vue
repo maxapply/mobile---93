@@ -1,12 +1,13 @@
 <template>
-    <div>login</div>
+  <div class="user-login">
+    <van-nav-bar title="登录"></van-nav-bar>
+  </div>
 </template>
 
 <script>
 export default {
-  name: ''
+  name: 'user-chat'
 }
 </script>
 
-<style lang="less" scoped>
-</style>
+<style scoped lang='less'></style>
