@@ -42,12 +42,15 @@
         round：圆边效果
         block：块级样式设置，占据一行
       -->
-      <van-button type="info" size="small" round block>登录</van-button>
+      <van-button type="info" size="small" round block @click="login()">登录</van-button>
     </div>
   </div>
 </template>
 
 <script>
+// 导入账号校验的api函数
+import { apiUserLogin } from '@/api/user.js'
+
 export default {
   name: 'user-login',
   data () {
@@ -58,6 +61,27 @@ export default {
         mobile: '', // 手机号码
         code: '' // 验证码
       }
+    }
+  },
+  methods: {
+    async login () {
+      // apiUserLogin函数执行有可能成功、也有可能失败，请try、catch判断使用
+      try {
+        // 校验账号有效性
+        // 所有api函数返回结果就是axios返回结果，就是Promise对象
+        await apiUserLogin(this.loginForm)
+        // api函数执行成功代表账号正确
+        // 如果报400的错误信息，代表账号错误，并且是致命错误，会阻止后续程序代码运行
+        // 因此，判断账号是否正确，不用通过result返回值，需要try/catch介入
+      } catch (err) {
+        // 账号错误，$toast.fail()是vant组件库的"错误提示"应用语法
+        // 与之前的 $message.error()是对应的
+        // return 表示停止后续代码执行
+        return this.$toast.fail('用户名或密码错误' + err)
+      }
+
+      this.$toast.success('登录成功')
+      this.$router.push('/home') // 项目首页面
     }
   }
 }
