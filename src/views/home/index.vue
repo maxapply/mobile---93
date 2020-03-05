@@ -1,5 +1,5 @@
 <template>
-  <div class='container'>
+  <div class="container">
     <!--
       van-tabs:标签页组件
         v-model设置默认激活项目 ，激活根据是项目的下标，从0开始
@@ -8,7 +8,16 @@
         内容区域：标签对应内容
     -->
     <van-tabs v-model="activeChannelIndex">
-      <van-tab title="推荐">推荐内容展示</van-tab>
+      <van-tab title="推荐">
+        <!-- div的作用是给瀑布流区域设置“垂直滚动条”，使得可以进行上拉操作 -->
+        <div class="scroll-wrapper">
+          <!-- 瀑布流加载效果实现 -->
+          <van-list v-model="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
+            <van-cell v-for="item in list" :key="item" :title="item"/>
+          </van-list>
+        </div>
+
+      </van-tab>
       <van-tab title="数据库">数据库内容展示</van-tab>
       <van-tab title="后端">后端内容展示</van-tab>
     </van-tabs>
@@ -20,11 +29,61 @@ export default {
   name: 'home-index',
   data () {
     return {
+      // 瀑布流相关成员
+      list: [],
+      loading: false,
+      finished: false,
       // 设置频道默认激活项目
-      activeChannelIndex: 1
+      activeChannelIndex: 0
+    }
+  },
+  methods: {
+    onLoad () {
+      // 异步更新数据
+      // setTimeout 仅做示例，真实场景中一般为 ajax 请求
+      setTimeout(() => {
+        for (let i = 0; i < 10; i++) {
+          this.list.push(this.list.length + 1)
+        }
+
+        // 加载状态结束
+        this.loading = false
+
+        // 数据全部加载完成
+        if (this.list.length >= 40) {
+          this.finished = true
+        }
+      }, 1000)
     }
   }
 }
 </script>
 
-<style scoped lang='less'></style>
+<style scoped lang='less'>
+.van-tabs {
+  // 弹性布局
+  display: flex;
+  // 灵活的项目将垂直显示，正如一个列一样
+  flex-direction: column;
+  height: 100%;
+  // 标签页全部内容展示区域
+  /deep/ .van-tabs__content {
+    // flex:1;的值是1 1 0%，【父控件有剩余空间占1份放大，父控件空间不足按1缩小，自身的空间大小是0%】
+    flex: 1;
+    overflow: hidden;
+  }
+  // 标签页具体内容展示区域
+  /deep/ .van-tab__pane {
+    height: 100%;
+    // 给上拉列表区域设置样式
+    .scroll-wrapper {
+      height: 100%;
+      overflow-y: auto;
+    }
+  }
+  // 给频道下边沿横向设置样式
+  /deep/ .van-tabs__line {
+    background-color: #1989fa;
+  }
+}
+</style>
