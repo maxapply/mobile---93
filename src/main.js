@@ -14,6 +14,10 @@ import 'amfe-flexible/index.min.js'
 // 注意：在vant的css样式导入之后设置
 import '@/assets/css/global.less'
 
+// 导入vee-validate规则文件
+// 本质：就是validate.js文件内容在该处“执行”
+import '@/utils/validate.js'
+
 // vant的注册
 // 本质：全局方式注册了n多的组件和全局成员
 //       Vue.component(xx,function(){})
