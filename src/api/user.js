@@ -6,6 +6,7 @@ import request from '@/utils/request.js'
 // data: {mobile:xx, code:xx} 对象参数
 // 现在对data做升级，使得在没有任何注释信息的条件下，也直接知道当前api函数需要什么参数，提高开发效率
 // 把参数做成是 “对象解构赋值” 的样子，这样就知道需要哪个参数了
+// 按需导出  (导入 import {apiUserLogin,xx,yy,zz} from 'xx.js')
 // export function apiUserLogin (data) {
 export function apiUserLogin ({ mobile, code }) {
   // 调用axios

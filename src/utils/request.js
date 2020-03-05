@@ -23,7 +23,7 @@ import router from '@/router/index.js'
 const instance = axios.create({
   // 请求公共根地址
   baseURL: 'http://ttapi.research.itcast.cn/',
-  // 超大整型数字转换器
+  // 超大整型数字【转换器】
   transformResponse: [function (data) {
     // 服务器端返回的data数据是字符串
     // 1. 实体字符串 "{name:value,name:value,name:value}""
@@ -90,5 +90,5 @@ instance.interceptors.response.use(function (response) {
   return Promise.reject(error)
 })
 
-// 对外导出axios对象
+// 对外导出axios对象，默认导出（导入import xxx from 'xx.js'）
 export default instance
