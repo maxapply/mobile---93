@@ -35,7 +35,7 @@
       -->
       <!-- ref可以用于获得"组件对象" 或 "dom节点对象"
         this.$refs.loginFormRef  // 获得组件对象
-       -->
+      -->
       <ValidationObserver ref="loginFormRef">
         <ValidationProvider rules="required|phone" name="手机号" v-slot="{ errors }">
           <!-- error-message:给输入框设置表达校验错误信息 -->
@@ -75,7 +75,15 @@
         round：圆边效果
         block：块级样式设置，占据一行
       -->
-      <van-button type="info" size="small" round block @click="login()">登录</van-button>
+      <van-button
+        type="info"
+        size="small"
+        round
+        block
+        @click="login()"
+        :loading="isLogin"
+        loading-text="登录中..."
+      >登录</van-button>
     </div>
   </div>
 </template>
@@ -95,11 +103,12 @@ export default {
   },
   data () {
     return {
+      isLogin: false, // 按钮是否处于加载中
       // 登录表单数据对象
       // mobile和code是"api数据接口"告诉的，不是自定义的
       loginForm: {
-        mobile: '', // 手机号码
-        code: '' // 验证码
+        mobile: '13911111111', // 手机号码
+        code: '246810' // 验证码
       }
     }
   },
@@ -113,6 +122,9 @@ export default {
         return false
       }
 
+      // 按钮处于加载中
+      this.isLogin = true
+
       // apiUserLogin函数执行有可能成功、也有可能失败，请try、catch判断使用
       try {
         // 校验账号有效性
@@ -122,12 +134,16 @@ export default {
         // 如果报400的错误信息，代表账号错误，并且是致命错误，会阻止后续程序代码运行
         // 因此，判断账号是否正确，不用通过result返回值，需要try/catch介入
       } catch (err) {
+        // 回复按钮加载中状态
+        this.isLogin = false
         // 账号错误，$toast.fail()是vant组件库的"错误提示"应用语法
         // 与之前的 $message.error()是对应的
         // return 表示停止后续代码执行
         return this.$toast.fail('用户名或密码错误' + err)
       }
 
+      // 回复按钮加载中状态
+      this.isLogin = false
       this.$toast.success('登录成功')
       this.$router.push('/home') // 项目首页面
     }
