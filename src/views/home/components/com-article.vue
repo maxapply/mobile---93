@@ -1,7 +1,16 @@
 <template>
   <!-- div的作用是给瀑布流区域设置“垂直滚动条”，使得可以进行上拉操作 -->
   <div class="scroll-wrapper">
-    <!-- 瀑布流加载效果实现
+    <!-- 下拉包围上拉 -->
+    <!--
+      v-model："isLoading" 设置下拉加载状态的
+              // true：正在加载，自动修改为真，当发生"下拉"动作就变为true
+              // false默认值，加载结束需要手动修改为false
+      @refresh="onRefresh" 事件，当发生"下拉"动作是，该事件自动执行
+                          // 该事件可以实现数据获取操作
+    -->
+    <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
+      <!-- 瀑布流加载效果实现
             瀑布流执行：
             1. 页面加载完毕，其会自动执行
               (内部会判断当前瀑布区域没有数据，当然要执行获取数据)
@@ -18,15 +27,16 @@
 
             finished-text="没有更多了"  瀑布流停止，底部文字提示
             @load="onLoad"  是事件，是做加载数据的时候执行的
-    -->
-    <van-list v-model="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
-      <!-- van-cell单元格组件
+      -->
+      <van-list v-model="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
+        <!-- van-cell单元格组件
               特点：独占一行
               用法非常灵活、复杂
               title：单元格标题内容
-      -->
-      <van-cell v-for="item in list" :key="item" :title="item"/>
-    </van-list>
+        -->
+        <van-cell v-for="item in list" :key="item" :title="item"/>
+      </van-list>
+    </van-pull-refresh>
   </div>
 </template>
 
@@ -35,6 +45,8 @@ export default {
   name: 'com-article',
   data () {
     return {
+      // 下拉成员
+      isLoading: false, // 是否处于加载状态
       // 瀑布流相关成员
       list: [], // 数据源
       loading: false, // 瀑布流是否加载处于动画效果
@@ -42,6 +54,16 @@ export default {
     }
   },
   methods: {
+    // 下拉执行的动作
+    onRefresh () {
+      // 设置1s延迟
+      setTimeout(() => {
+        this.onLoad() // 调用上拉获得数据
+        this.isLoading = false // 下拉加载完成/结束加载动画
+        this.$toast.success('刷新成功') // 成功提示
+      }, 1000)
+    },
+
     // 瀑布流上拉执行的动作
     onLoad () {
       // 异步更新数据
