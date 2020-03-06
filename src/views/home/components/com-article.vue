@@ -112,6 +112,9 @@ export default {
 
     // 瀑布流上拉执行的动作
     async onLoad () {
+      // 每次执行给延迟0.8秒
+      await this.$sleep(800)
+
       // 瀑布 与 真实文章 结合
       // 1. 获得真实文章数据
       const articles = await this.getArticleList()
