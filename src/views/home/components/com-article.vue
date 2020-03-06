@@ -36,11 +36,38 @@
               模板中应用超大整型数据，需要通过toString转换为"字符串"
         -->
         <!-- <van-cell v-for="item in list" :key="item" :title="item"/> -->
-        <van-cell
-          v-for="item in articleList"
-          :key="item.art_id.toString()"
-          :title="item.title"/>
-
+        <van-cell v-for="item in articleList" :key="item.art_id.toString()" :title="item.title">
+          <!-- 通过命名插槽方式体现单元格下方描述信息 -->
+          <template slot="label">
+            <!-- 新闻封面图片也是通过label描述位置体现
+              :column-num 根据type的值决定显示的列数
+              v-if="item.cover.type>0" 要求type>0才体现宫格
+              :border="false" 宫格没有边框
+            -->
+            <van-grid
+              :column-num="item.cover.type"
+              :gutter="10"
+              :border="false"
+              v-if="item.cover.type>0"
+            >
+              <!-- 封面图片类型：没有type=0、 1个type=1、 3个type=3 -->
+              <!-- v-for可以对数字做遍历 -->
+              <!-- v-for="xx in 3" //xx: 1、2、3  -->
+              <van-grid-item v-for="item2 in item.cover.type" :key="item2">
+                <!-- van-image是表现图片的组件，图片下标是从0开始，自然item2-1操作 -->
+                <van-image  width="85" height="85" :src="item.cover.images[item2-1]"/>
+              </van-grid-item>
+            </van-grid>
+            <p>
+              <span>作者:{{item.aut_name}}</span>
+              &nbsp;
+              <span>评论 :{{item.comm_count}}</span>
+              &nbsp;
+              <span>时间:{{item.pubdate}}</span>
+              &nbsp;
+            </p>
+          </template>
+        </van-cell>
       </van-list>
     </van-pull-refresh>
   </div>
