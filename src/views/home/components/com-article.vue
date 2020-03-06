@@ -33,14 +33,23 @@
               特点：独占一行
               用法非常灵活、复杂
               title：单元格标题内容
+              模板中应用超大整型数据，需要通过toString转换为"字符串"
         -->
-        <van-cell v-for="item in list" :key="item" :title="item"/>
+        <!-- <van-cell v-for="item in list" :key="item" :title="item"/> -->
+        <van-cell
+          v-for="item in articleList"
+          :key="item.art_id.toString()"
+          :title="item.title"/>
+
       </van-list>
     </van-pull-refresh>
   </div>
 </template>
 
 <script>
+// 获得文章列表的api
+import { apiArticleList } from '@/api/article.js'
+
 export default {
   name: 'com-article',
   // 接收父组件传递过来的频道id信息
@@ -57,6 +66,9 @@ export default {
   },
   data () {
     return {
+      articleList: [], // 文章列表信息
+      // 通过ts声明时间戳条件，这样后期可以灵活发生变化
+      ts: Date.now(), // 文章列表分页"时间戳"条件
       // 下拉成员
       isLoading: false, // 是否处于加载状态
       // 瀑布流相关成员
@@ -65,7 +77,29 @@ export default {
       finished: false // 瀑布流是否停止
     }
   },
+  created () {
+    // 获得真实文章列表数据
+    this.getArticleList()
+  },
   methods: {
+    // 获得文章列表信息
+    // async修饰的函数，这个函数如果有return返回信息，
+    // 信息类型是Promise对象
+
+    async getArticleList () {
+      // 调用api获得数据（参数:频道id、时间戳）
+      const obj = {
+        channel_id: this.channelID,
+        timestamp: this.ts
+      }
+      const result = await apiArticleList(obj)
+      // console.log(result)
+      // data接收数据
+      // 升级：不要把数据给与data成员，要在瀑布里边发生给与动作
+      //       在这里边请return返回，用瀑布接收使用
+      return result
+      // this.articleList = result.results
+    },
     // 下拉执行的动作
     onRefresh () {
       // 设置1s延迟
@@ -77,23 +111,31 @@ export default {
     },
 
     // 瀑布流上拉执行的动作
-    onLoad () {
-      // 异步更新数据
-      // setTimeout 仅做示例，真实场景中一般为 ajax 请求
-      setTimeout(() => {
-        for (let i = 0; i < 10; i++) {
-          this.list.push(this.list.length + 1)
-        }
+    async onLoad () {
+      // 瀑布 与 真实文章 结合
+      // 1. 获得真实文章数据
+      const articles = await this.getArticleList()
+      // articles:{results:文章列表，pre_timestamp:分页时间戳}
+      // console.log(articles)
+      // 2. 对数据做处理
+      if (articles.results.length > 0) {
+        // 有获得数据
+        // data接收数据，要设置"追加"，不要直接赋值
+        // 直接赋值会使得瀑布的数据区域填充不满，会造成瀑布不断加载效果
+        // this.articleList = articles.results
+        // articles.results:[{id,title,xx},{id,title,xx},{id,title,}……]
+        this.articleList.push(...articles.results)
+        // ... 展开运算符，是要把[]数组标志给去除，使得内部各个小元素暴露出来，进而被push追加使用
+        // this.articleList.push({id,title,xx},{id,title,xx},{id,title,}……)
+        // 更新时间戳，方便获取"下一页"数据
+        this.ts = articles.pre_timestamp
+      } else {
+        // 没有获得到数据，要停止瀑布流
+        this.finished = true
+      }
 
-        // 加载状态结束
-        this.loading = false
-
-        // 数据全部加载完成
-        if (this.list.length >= 40) {
-          // 已经没有更多了，瀑布停止了
-          this.finished = true
-        }
-      }, 1000)
+      // 3. 停止瀑布加载动画
+      this.loading = false
     }
   }
 }
