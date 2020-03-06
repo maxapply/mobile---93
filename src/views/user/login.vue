@@ -32,6 +32,9 @@
         （v-slot与 slot-scope作用相似，用于接收插槽数据）
 
         注意: required|phone ,|竖向 左右不要设置空格
+
+        v-slot="{errors}"
+        slot-scope="{errors}"
       -->
       <!-- ref可以用于获得"组件对象" 或 "dom节点对象"
         this.$refs.loginFormRef  // 获得组件对象
@@ -129,7 +132,15 @@ export default {
       try {
         // 校验账号有效性
         // 所有api函数返回结果就是axios返回结果，就是Promise对象
-        await apiUserLogin(this.loginForm)
+        const result = await apiUserLogin(this.loginForm)
+        // console.log(result) // 输出服务器端返回的秘钥数据{token:xx,refresh_token:xx}
+        // return false
+        // 通过Vuex对当前用户登录后返回的状态秘钥信息进行保存
+        // 注意：result直接表现为token和refresh_token的对象
+        //       result本身不用调用data或 data.data 进一步获取数据
+        //       因为data或data.data已经在axios响应拦截器中封装好了
+        this.$store.commit('updateUser', result)
+
         // api函数执行成功代表账号正确
         // 如果报400的错误信息，代表账号错误，并且是致命错误，会阻止后续程序代码运行
         // 因此，判断账号是否正确，不用通过result返回值，需要try/catch介入
