@@ -8,14 +8,8 @@
         内容区域：标签对应内容
     -->
     <van-tabs v-model="activeChannelIndex">
-      <van-tab title="推荐">
+      <van-tab :title="item.name" v-for="item in channelList" :key="item.id">
         <!-- 使用 -->
-        <com-article></com-article>
-      </van-tab>
-      <van-tab title="数据库">
-        <com-article></com-article>
-      </van-tab>
-      <van-tab title="后端">
         <com-article></com-article>
       </van-tab>
     </van-tabs>
@@ -23,6 +17,9 @@
 </template>
 
 <script>
+// 导入获得频道的api函数
+import { apiChannelList } from '@/api/channel.js'
+
 // 导入文章瀑布组件
 import ComArticle from './components/com-article.vue'
 export default {
@@ -33,11 +30,26 @@ export default {
   },
   data () {
     return {
+      // 频道列表数据
+      channelList: [],
       // 设置频道默认激活项目
       activeChannelIndex: 0
     }
+  },
+  created () {
+    // 自动、第一时间 获取频道数据
+    this.getChannelList()
+  },
+  methods: {
+    // 获得频道列表数据
+    async getChannelList () {
+      // 通过api获得数据
+      const result = await apiChannelList()
+      // console.log(result)
+      // data成员接收频道数据
+      this.channelList = result.channels
+    }
   }
-
 }
 </script>
 
