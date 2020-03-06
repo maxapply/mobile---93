@@ -9,8 +9,8 @@
     -->
     <van-tabs v-model="activeChannelIndex">
       <van-tab :title="item.name" v-for="item in channelList" :key="item.id">
-        <!-- 使用 -->
-        <com-article></com-article>
+        <!-- 使用 ，把激活频道id当参数，传递给子组件-->
+        <com-article :channelID="item.id"></com-article>
       </van-tab>
     </van-tabs>
   </div>

@@ -43,6 +43,18 @@
 <script>
 export default {
   name: 'com-article',
+  // 接收父组件传递过来的频道id信息
+  // 1. 简易方式接收
+  // props: ['channelID'],
+  // 2. 高级方式接收
+  props: {
+    channelID: {
+      // type:类型限制String Number Array, 类型不符合，就接收不到
+      // required:true, 参数必须传递
+      type: Number,
+      required: true
+    }
+  },
   data () {
     return {
       // 下拉成员
