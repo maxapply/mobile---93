@@ -81,7 +81,13 @@
       </van-list>
     </van-pull-refresh>
 
-    <!-- 文章更多操作弹出层 -->
+    <!-- 文章更多操作弹出层
+      当前(父)组件把showDialog=true的信息传递给子组件
+      子组件会把false的信息回传回来对showDialog进行赋值
+
+      弹出框组件只要被关闭，那么其value就由true变为false
+      那么@input事件要执行，进而把false信息就回传回来了
+    -->
     <more-action v-model="showDialog"></more-action>
 
   </div>

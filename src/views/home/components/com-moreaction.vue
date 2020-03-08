@@ -9,18 +9,42 @@
 
   closeOnClickOverlay 是否在点击遮罩层后关闭弹窗,不要绑定内容，就是true被绑定
   :closeOnClickOverlay="true"
+
+  closed 关闭弹窗时触发,isOneLevel=true，使得一级菜单被设置激活
     -->
     <van-dialog
       :value="value"
       @input="$emit('input',$event)"
-      :showConfirmButton="false" closeOnClickOverlay>
-      <img src="https://img.yzcdn.cn/vant/apple-3.jpg" width="230" height="130">
+      :showConfirmButton="false"
+      closeOnClickOverlay
+      @closed="isOneLevel=true"
+    >
+      <van-cell-group v-if="isOneLevel">
+        <!-- 一级菜单 -->
+        <van-cell title="不感兴趣" icon="location-o"></van-cell>
+        <van-cell title="反馈垃圾内容" icon="location-o" is-link @click="isOneLevel=false"></van-cell>
+        <van-cell title="拉黑作者" icon="location-o"></van-cell>
+      </van-cell-group>
+      <van-cell-group v-else>
+        <!-- 二级菜单 -->
+        <van-cell icon="arrow-left" @click="isOneLevel=true"></van-cell>
+        <van-cell title="其他问题" icon="location-o"></van-cell>
+        <van-cell title="标题夸张" icon="location-o"></van-cell>
+        <van-cell title="低俗色情" icon="location-o"></van-cell>
+        <van-cell title="错别字多" icon="location-o"></van-cell>
+        <van-cell title="旧闻重复" icon="location-o"></van-cell>
+        <van-cell title="广告软文" icon="location-o"></van-cell>
+        <van-cell title="内容不实" icon="location-o"></van-cell>
+        <van-cell title="涉嫌违法犯罪" icon="location-o"></van-cell>
+        <van-cell title="侵权" icon="location-o"></van-cell>
+      </van-cell-group>
+
     </van-dialog>
-      <!-- :value+@input 是 v-model的体现
+    <!-- :value+@input 是 v-model的体现
         @input="$emit('input')" $emit调用input事件，把感知到的信息
         传递给事件对应的v-model成员里边，即父组件的showDialog
         当前组件，鼠标单击对话框旁处，就可以使得value属性值为false
-        这个false信息要传递给showDialog，这可以使得后续该弹出框不断被展示出来
+        这个false信息要传递给showDialog，这可以使得后续该弹出框"不断"被展示出来
 
         理论上代码应该为：$emit('input',$event.target.value)
         实际上不要设置$event.target.value，设置到不对，因为
@@ -30,7 +54,7 @@
 
         组件标签都是：@input="$emit('input',$event)"
         普通表单域：$emit('input',$event.target.value)
-      -->
+    -->
   </div>
 </template>
 
@@ -40,7 +64,7 @@ export default {
   props: ['value'],
   data () {
     return {
-      show: false
+      isOneLevel: true // 控制一级、二级信息明细显示
     }
   }
 }
