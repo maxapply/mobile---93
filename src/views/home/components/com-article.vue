@@ -94,7 +94,11 @@
 
       :articleID="nowArticleID" 把当前目标文章id传递给子组件
     -->
-    <more-action v-model="showDialog" :articleID="nowArticleID"></more-action>
+    <more-action
+      v-model="showDialog"
+      :articleID="nowArticleID"
+      @dislikeSuccess="handleDislikeSuccess()"
+      ></more-action>
 
   </div>
 </template>
@@ -143,6 +147,22 @@ export default {
     this.getArticleList()
   },
   methods: {
+    // 文章不感兴趣的处理处理，清除目标文章
+    handleDislikeSuccess () {
+      // 让 nowArticleID 文章在列表中消失
+      // 1. 获得目标文章id在文章列表中的下标序号
+      //    findIndex()是数组的一个方法，可以通过条件获得指定目标在数组列表中的"下标序号"，有遍历机制
+      // 各种底层方法api：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide
+      const index = this.articleList.findIndex((item) => {
+        // 满足条件就return为true信息出来，那么当前项目的下标序号就获得的到了
+        return item.art_id.toString() === this.nowArticleID
+      })
+      // 2. 通过下标序号从列表中删除指定的文章
+      // 数组.splice(下标, 长度)
+      this.articleList.splice(index, 1)
+      // (只是页面级删除)
+    },
+
     // 展示子组件弹出框逻辑
     // artID：被处理文章的id
     displayDialog (artID) {
