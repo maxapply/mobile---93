@@ -4,6 +4,20 @@ import request from '@/utils/request.js'
 // 文章相关api函数制作
 
 /**
+ * 对文章不感兴趣处理
+ * @param {目标文章id} articleID
+ */
+export function apiArticleDislike (articleID) {
+  return request({
+    url: '/app/v1_0/article/dislikes',
+    method: 'post',
+    data: {
+      target: articleID
+    }
+  })
+}
+
+/**
  * 根据频道获得文章列表信息
  * channel_id 是 频道ID
  * timestamp 是 时间戳整数 单位毫秒 时间戳，请求新的推荐数据传当前的时间戳，请求历史推荐传指定的时间戳
