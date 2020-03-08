@@ -3,8 +3,12 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 
-// vant导入
-import Vant from 'vant'
+// 导入,Vant是默认的成员导入，Lazyload是按需成员导入
+// eslint要求：同一个功能包的不同模块对象要使用一个语句到导入进来
+// 默认、按需同时导入 import XXX,{YYY,KKK,MMM} from '模块'
+// 注意：默认在前，按需在后
+import Vant, { Lazyload } from 'vant'
+
 // vant的样式导入
 import 'vant/lib/index.css'
 // rem适配基准值 相关依赖包导入
@@ -18,6 +22,17 @@ import '@/assets/css/global.less'
 // 本质：就是validate.js文件内容在该处“执行”
 import '@/utils/validate.js'
 
+// 导入全部的过滤器成员
+import * as filters from '@/utils/filters.js' // global filters
+
+// 注册全部的过滤器
+// 全局过滤器注册
+// Object.keys() 获得对象的全部成员名称，以数组返回['timeAgo','parseTime','formatTime'...]
+Object.keys(filters).forEach(key => {
+  // Vue.filter('timeAgo', function(参数){})
+  Vue.filter(key, filters[key])
+})
+
 // vant的注册
 // 本质：全局方式注册了n多的组件和全局成员
 //       Vue.component(xx,function(){})
@@ -25,6 +40,8 @@ import '@/utils/validate.js'
 //       Vue.prototype.xxx = yyy
 //       ……
 Vue.use(Vant)
+// 对Lazyload指令做注册
+Vue.use(Lazyload)
 
 // 设置一个全局延迟器，是Vue的继承成员，名称为$sleep，就是"自定义"的
 // 使得组件可以调用： this.$sleep() ,开始要做延迟执行

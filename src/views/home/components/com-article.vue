@@ -54,8 +54,16 @@
               <!-- v-for可以对数字做遍历 -->
               <!-- v-for="xx in 3" //xx: 1、2、3  -->
               <van-grid-item v-for="item2 in item.cover.type" :key="item2">
-                <!-- van-image是表现图片的组件，图片下标是从0开始，自然item2-1操作 -->
-                <van-image  width="85" height="85" :src="item.cover.images[item2-1]"/>
+                <!-- van-image是表现图片的组件，图片下标是从0开始，而item2是从1开始的，所以要item2-1操作
+                  设置lazy-load  "指令"，使得图片有懒加载功能
+                  lazy-load  或  :lazy-load="true"  都是表示该属性接收为true的信息
+                -->
+                <van-image
+                  width="85"
+                  height="85"
+                  :src="item.cover.images[item2-1]"
+                  lazy-load
+                />
               </van-grid-item>
             </van-grid>
             <p>
@@ -63,7 +71,7 @@
               &nbsp;
               <span>评论 :{{item.comm_count}}</span>
               &nbsp;
-              <span>时间:{{item.pubdate}}</span>
+              <span>时间:{{item.pubdate | formatTime}}</span>
               &nbsp;
             </p>
           </template>
