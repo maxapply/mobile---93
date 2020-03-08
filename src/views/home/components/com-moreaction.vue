@@ -21,7 +21,7 @@
     >
       <van-cell-group v-if="isOneLevel">
         <!-- 一级菜单 -->
-        <van-cell title="不感兴趣" icon="location-o"></van-cell>
+        <van-cell title="不感兴趣" icon="location-o" @click="articleDislike()"></van-cell>
         <van-cell title="反馈垃圾内容" icon="location-o" is-link @click="isOneLevel=false"></van-cell>
         <van-cell title="拉黑作者" icon="location-o"></van-cell>
       </van-cell-group>
@@ -59,6 +59,8 @@
 </template>
 
 <script>
+// 文章不感兴趣的api函数
+import { apiArticleDislike } from '@/api/article.js'
 export default {
   name: 'more-action',
   // 接收父组件传递来的信息
@@ -76,6 +78,18 @@ export default {
   data () {
     return {
       isOneLevel: true // 控制一级、二级信息明细显示
+    }
+  },
+  methods: {
+    // 文章不感兴趣处理
+    async articleDislike () {
+      // 调用api
+      // 当前处理，正常情况成功率100%
+      await apiArticleDislike(this.articleID)
+
+      this.$toast.success('处理成功')
+      // 关闭弹出框,修改父组件的showDialog的值为false，进而影响子组件关闭弹框
+      this.$emit('input', false)
     }
   }
 }
