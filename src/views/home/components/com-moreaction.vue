@@ -61,7 +61,18 @@
 <script>
 export default {
   name: 'more-action',
-  props: ['value'],
+  // 接收父组件传递来的信息
+  // props: ['value', 'articleID'],
+  props: {
+    value: {
+      type: Boolean,
+      default: false
+    },
+    articleID: {
+      type: String,
+      required: true
+    }
+  },
   data () {
     return {
       isOneLevel: true // 控制一级、二级信息明细显示

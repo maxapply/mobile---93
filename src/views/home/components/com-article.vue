@@ -67,8 +67,12 @@
               </van-grid-item>
             </van-grid>
             <p>
-              <!-- name="close"代表叉号 -->
-              <van-icon name="close" style="float:right;" @click="displayDialog()" />
+              <!-- name="close"代表叉号
+                item.art_id.toString() 代表被处理的文章id信息
+              -->
+              <van-icon name="close" style="float:right;"
+                @click="displayDialog(item.art_id.toString())" />
+
               <span>作者:{{item.aut_name}}</span>
               &nbsp;
               <span>评论 :{{item.comm_count}}</span>
@@ -87,8 +91,10 @@
 
       弹出框组件只要被关闭，那么其value就由true变为false
       那么@input事件要执行，进而把false信息就回传回来了
+
+      :articleID="nowArticleID" 把当前目标文章id传递给子组件
     -->
-    <more-action v-model="showDialog"></more-action>
+    <more-action v-model="showDialog" :articleID="nowArticleID"></more-action>
 
   </div>
 </template>
@@ -119,6 +125,7 @@ export default {
   },
   data () {
     return {
+      nowArticleID: '', // 被处理的文章id
       showDialog: false, // 控制子组件弹出框显示的标志
       articleList: [], // 文章列表信息
       // 通过ts声明时间戳条件，这样后期可以灵活发生变化
@@ -137,8 +144,11 @@ export default {
   },
   methods: {
     // 展示子组件弹出框逻辑
-    displayDialog () {
+    // artID：被处理文章的id
+    displayDialog (artID) {
       this.showDialog = true // 弹出框显示
+      // data接收artID
+      this.nowArticleID = artID
     },
 
     // 获得文章列表信息
