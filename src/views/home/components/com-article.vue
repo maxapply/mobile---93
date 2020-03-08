@@ -67,6 +67,8 @@
               </van-grid-item>
             </van-grid>
             <p>
+              <!-- name="close"代表叉号 -->
+              <van-icon name="close" style="float:right;" @click="displayDialog()" />
               <span>作者:{{item.aut_name}}</span>
               &nbsp;
               <span>评论 :{{item.comm_count}}</span>
@@ -78,15 +80,25 @@
         </van-cell>
       </van-list>
     </van-pull-refresh>
+
+    <!-- 文章更多操作弹出层 -->
+    <more-action v-model="showDialog"></more-action>
+
   </div>
 </template>
 
 <script>
+// 对子组件com-moreaction.vue 做 导入、注册、使用
+import MoreAction from './com-moreaction.vue'
+
 // 获得文章列表的api
 import { apiArticleList } from '@/api/article.js'
 
 export default {
   name: 'com-article',
+  components: {
+    MoreAction
+  },
   // 接收父组件传递过来的频道id信息
   // 1. 简易方式接收
   // props: ['channelID'],
@@ -101,6 +113,7 @@ export default {
   },
   data () {
     return {
+      showDialog: false, // 控制子组件弹出框显示的标志
       articleList: [], // 文章列表信息
       // 通过ts声明时间戳条件，这样后期可以灵活发生变化
       ts: Date.now(), // 文章列表分页"时间戳"条件
@@ -117,6 +130,11 @@ export default {
     this.getArticleList()
   },
   methods: {
+    // 展示子组件弹出框逻辑
+    displayDialog () {
+      this.showDialog = true // 弹出框显示
+    },
+
     // 获得文章列表信息
     // async修饰的函数，这个函数如果有return返回信息，
     // 信息类型是Promise对象
