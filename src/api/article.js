@@ -4,6 +4,26 @@ import request from '@/utils/request.js'
 // 文章相关api函数制作
 
 /**
+ * target integer 必须  举报的文章id
+ * type integer 必须  举报类型： 0-其他问题，1-标题夸张，2-低俗色情，3-错别字多，4-旧闻重复，5-广告软文，6-内容不实，7-涉嫌违法犯罪，8-侵权'
+ * remark string 非必须  其他问题 的附加说明
+ * @param {目标文章id} articleID
+ * @param {被举报类型标志} type
+ * @param {相关说明，非必须的} remark
+ */
+export function apiArticleReport ({ articleID, type, remark }) {
+  return request({
+    url: '/app/v1_0/article/reports',
+    method: 'post',
+    data: {
+      target: articleID,
+      type,
+      remark
+    }
+  })
+}
+
+/**
  * 对文章不感兴趣处理
  * @param {目标文章id} articleID
  */
