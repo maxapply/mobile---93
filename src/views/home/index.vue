@@ -9,7 +9,7 @@
     -->
     <van-tabs v-model="activeChannelIndex">
       <!-- 给标签页的左侧或右侧通过命名插槽设置内容 -->
-      <div slot="nav-right" class="channel-more">
+      <div slot="nav-right" class="channel-more" @click="showPopup=true">
         <!-- 三杠图标 -->
         <van-icon name="wap-nav"/>
       </div>
@@ -18,10 +18,16 @@
         <com-article :channelID="item.id"></com-article>
       </van-tab>
     </van-tabs>
+
+    <!-- 应用频道子组件弹出层 -->
+    <com-channel v-model="showPopup"></com-channel>
   </div>
 </template>
 
 <script>
+// 导入com-channel.vue
+import ComChannel from './components/com-channel.vue'
+
 // 导入获得频道的api函数
 import { apiChannelList } from '@/api/channel.js'
 
@@ -31,10 +37,12 @@ export default {
   name: 'home-index',
   components: {
     // 注册
-    ComArticle
+    ComArticle,
+    ComChannel
   },
   data () {
     return {
+      showPopup: false, // 控制子组件弹出层是否显示
       // 频道列表数据
       channelList: [],
       // 设置频道默认激活项目
