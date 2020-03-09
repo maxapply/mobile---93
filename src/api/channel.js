@@ -4,6 +4,16 @@ import request from '@/utils/request.js'
 // 频道相关api函数配置文件
 
 /**
+ * 获得全部频道
+ */
+export function apiChannelAll () {
+  return request({
+    url: '/app/v1_0/channels',
+    method: 'get'
+  })
+}
+
+/**
  * 获取用户的频道列表数据
  * 一般数据获取请求方式都是get
  * 当前函数不要传递参数(从【接口文档】可知)
