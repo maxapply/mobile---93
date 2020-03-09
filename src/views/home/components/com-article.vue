@@ -8,8 +8,14 @@
               // false默认值，加载结束需要手动修改为false
       @refresh="onRefresh" 事件，当发生"下拉"动作是，该事件自动执行
                           // 该事件可以实现数据获取操作
+      :success-text="successText" 下拉动作完成后的信息提示[已经是最新的了/文章更新成功]
+      success-duration="1500 下拉动作完成后的信息提示 停留时间
     -->
-    <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
+    <van-pull-refresh
+      v-model="isLoading"
+      @refresh="onRefresh"
+      :success-text="successText"
+      success-duration="1500">
       <!-- 瀑布流加载效果实现
             瀑布流执行：
             1. 页面加载完毕，其会自动执行
@@ -129,6 +135,7 @@ export default {
   },
   data () {
     return {
+      successText: '文章更新成功', // 下拉动作完成后的动画提示内容
       nowArticleID: '', // 被处理的文章id
       showDialog: false, // 控制子组件弹出框显示的标志
       articleList: [], // 文章列表信息
@@ -196,18 +203,18 @@ export default {
       // 获得新文章
       const articles = await this.getArticleList()
 
-      // 头部追加新文章、更新时间戳
-      this.articleList.unshift(...articles.results)
-      this.ts = articles.pre_timestamp
+      if (articles.results.length > 0) {
+        // 头部追加新文章、更新时间戳
+        this.articleList.unshift(...articles.results)
+        this.ts = articles.pre_timestamp
+        // 提示： 文章更新成功
+        this.successText = '文章更新成功'
+      } else {
+        // 提示： 已经是最新的了
+        this.successText = '已经是最新的了'
+      }
       // 下拉动画结束
       this.isLoading = false
-
-      // // 设置1s延迟
-      // setTimeout(() => {
-      //   this.onLoad() // 调用上拉获得数据
-      //   this.isLoading = false // 下拉加载完成/结束加载动画
-      //   this.$toast.success('刷新成功') // 成功提示
-      // }, 1000)
     },
 
     // 瀑布流上拉执行的动作
