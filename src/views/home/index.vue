@@ -36,8 +36,8 @@
 // 导入com-channel.vue
 import ComChannel from './components/com-channel.vue'
 
-// 导入获得频道的api函数:我的频道、全部频道
-import { apiChannelList, apiChannelAll } from '@/api/channel.js'
+// 导入获得频道的api函数:我的频道
+import { apiChannelList } from '@/api/channel.js'
 
 // 导入文章瀑布组件
 import ComArticle from './components/com-article.vue'
@@ -48,23 +48,9 @@ export default {
     ComArticle,
     ComChannel
   },
-  // 计算属性有缓存，相关data不变化，"结果"会缓存，提升系统性能
-  computed: {
-    // 获得剩余频道( 全部频道-我的频道 )
-    restChannel () {
-      // 1. 把 我的频道  的 各个id获得出来，集成一个数组返回 [10,15,23,44……]
-      //    map是映射方法，遍历数组，并以"数组"形式返回修饰后的每个单元信息信息
-      //    参考：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide
-      const userChannelIDs = this.channelList.map(item => {
-        return item.id
-      })
-      return userChannelIDs
-      // 2. 对 全部频道 做过滤，把“不符合” 我的频道 的项目收集并返回出来，就是【剩余频道】
-    }
-  },
+
   data () {
     return {
-      channelAll: [], // 全部频道数据
       showPopup: false, // 控制子组件弹出层是否显示
       // 频道列表数据
       channelList: [],
@@ -75,15 +61,8 @@ export default {
   created () {
     // 自动、第一时间 获取频道数据
     this.getChannelList()
-    // 获得全部频道
-    this.getChannelAll()
   },
   methods: {
-    // 获得"全部"频道数据
-    async getChannelAll () {
-      const result = await apiChannelAll()
-      this.channelAll = result.channels
-    },
     // 获得频道列表数据
     async getChannelList () {
       // 通过api获得数据

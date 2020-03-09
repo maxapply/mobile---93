@@ -49,9 +49,9 @@
           </div>
         </div>
         <van-grid class="channel-content" :gutter="10" clickable>
-          <van-grid-item v-for="value in 8" :key="value">
+          <van-grid-item v-for="item in restChannel" :key="item.id">
             <div class="info">
-              <span class="text">文字</span>
+              <span class="text">{{item.name}}</span>
             </div>
           </van-grid-item>
         </van-grid>
@@ -61,8 +61,49 @@
 </template>
 
 <script>
+// 导入获得频道的api函数:全部频道
+import { apiChannelAll } from '@/api/channel.js'
 export default {
   name: 'com-channel',
+  // 计算属性有缓存，相关data不变化，"结果"会缓存，提升系统性能
+  computed: {
+    // 获得剩余频道( 全部频道-我的频道 )
+    restChannel () {
+      // 1. 把 我的频道  的 各个id获得出来，集成一个数组返回 [10,15,23,44……]
+      //    map是映射方法，遍历数组，并以"数组"形式返回修饰后的每个单元信息信息
+      //    参考：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide
+      const userChannelIDs = this.channelList.map(item => {
+        return item.id
+      })
+
+      // 2. 对 全部频道 做过滤，把“不符合” 我的频道 的项目收集并返回出来，就是【剩余频道】
+      //    数组.filter()  过滤方法，把符合条件的数组元素通过“新数组”给与返回
+      //    (全部频道 去除 我的频道 给与返回)
+      const rest = this.channelAll.filter(item => {
+        // 我的频道  里边不包含当前项目，就给与收集
+        // 判断我的频道id集合 是否包含当前项目，不包含的才收集
+        // 数组.includes(元素)  判断数组中是否有出现某个元素，返回Boolean
+        return !userChannelIDs.includes(item.id)
+      })
+      return rest
+    }
+  },
+  data () {
+    return {
+      channelAll: [] // 全部频道数据
+    }
+  },
+  created () {
+    // 获得全部频道
+    this.getChannelAll()
+  },
+  methods: {
+    // 获得"全部"频道数据
+    async getChannelAll () {
+      const result = await apiChannelAll()
+      this.channelAll = result.channels
+    }
+  },
   props: {
     // 接收v-model的数据信息
     value: {
