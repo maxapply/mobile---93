@@ -27,18 +27,15 @@
       </van-cell-group>
       <van-cell-group v-else>
         <!-- 二级菜单 -->
-        <van-cell icon="arrow-left" @click="isOneLevel=true"></van-cell>
-        <van-cell title="其他问题" icon="location-o"></van-cell>
-        <van-cell title="标题夸张" icon="location-o"></van-cell>
-        <van-cell title="低俗色情" icon="location-o"></van-cell>
-        <van-cell title="错别字多" icon="location-o"></van-cell>
-        <van-cell title="旧闻重复" icon="location-o"></van-cell>
-        <van-cell title="广告软文" icon="location-o"></van-cell>
-        <van-cell title="内容不实" icon="location-o"></van-cell>
-        <van-cell title="涉嫌违法犯罪" icon="location-o"></van-cell>
-        <van-cell title="侵权" icon="location-o"></van-cell>
-      </van-cell-group>
+        <van-cell icon="arrow-left" @click="isOneLevel=true" />
+        <van-cell
+          v-for="item in reportList"
+          :key="item.value"
+          :title="item.title"
+          icon="location-o">
+        </van-cell>
 
+      </van-cell-group>
     </van-dialog>
     <!-- :value+@input 是 v-model的体现
         @input="$emit('input')" $emit调用input事件，把感知到的信息
@@ -60,7 +57,7 @@
 
 <script>
 // 文章不感兴趣的api函数
-import { apiArticleDislike } from '@/api/article.js'
+import { apiArticleDislike, apiArticleReport } from '@/api/article.js'
 export default {
   name: 'more-action',
   // 接收父组件传递来的信息
@@ -77,6 +74,18 @@ export default {
   },
   data () {
     return {
+      // 文章举报类型明细
+      reportList: [
+        { title: '其他问题', value: 0 },
+        { title: '标题夸张', value: 1 },
+        { title: '低俗色情', value: 2 },
+        { title: '错别字多', value: 3 },
+        { title: '旧闻重复', value: 4 },
+        { title: '广告软文', value: 5 },
+        { title: '内容不实', value: 6 },
+        { title: '涉嫌违法犯罪', value: 7 },
+        { title: '侵权', value: 8 }
+      ],
       isOneLevel: true // 控制一级、二级信息明细显示
     }
   },
