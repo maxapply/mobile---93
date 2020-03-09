@@ -190,13 +190,24 @@ export default {
       // this.articleList = result.results
     },
     // 下拉执行的动作
-    onRefresh () {
-      // 设置1s延迟
-      setTimeout(() => {
-        this.onLoad() // 调用上拉获得数据
-        this.isLoading = false // 下拉加载完成/结束加载动画
-        this.$toast.success('刷新成功') // 成功提示
-      }, 1000)
+    async onRefresh () {
+      // 延迟器0.8秒
+      await this.$sleep(800)
+      // 获得新文章
+      const articles = await this.getArticleList()
+
+      // 头部追加新文章、更新时间戳
+      this.articleList.unshift(...articles.results)
+      this.ts = articles.pre_timestamp
+      // 下拉动画结束
+      this.isLoading = false
+
+      // // 设置1s延迟
+      // setTimeout(() => {
+      //   this.onLoad() // 调用上拉获得数据
+      //   this.isLoading = false // 下拉加载完成/结束加载动画
+      //   this.$toast.success('刷新成功') // 成功提示
+      // }, 1000)
     },
 
     // 瀑布流上拉执行的动作
