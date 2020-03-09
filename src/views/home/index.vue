@@ -8,6 +8,11 @@
         内容区域：标签对应内容
     -->
     <van-tabs v-model="activeChannelIndex">
+      <!-- 给标签页的左侧或右侧通过命名插槽设置内容 -->
+      <div slot="nav-right" class="channel-more">
+        <!-- 三杠图标 -->
+        <van-icon name="wap-nav"/>
+      </div>
       <van-tab :title="item.name" v-for="item in channelList" :key="item.id">
         <!-- 使用 ，把激活频道id当参数，传递给子组件-->
         <com-article :channelID="item.id"></com-article>
@@ -73,6 +78,22 @@ export default {
   // 给频道下边沿横向设置样式
   /deep/ .van-tabs__line {
     background-color: #1989fa;
+  }
+
+  /*给 更多 频道设置样式*/
+  .channel-more {
+    position: fixed;
+    right: 0;
+    background-color: white;
+    line-height: 88px;
+    height: 88px;
+    width: 90px;
+    text-align: center;
+    font-size: 40px;
+  }
+  /*频道标签页宽度减小一些*/
+  /deep/ .van-tabs__wrap {
+    width: 90%; /*设置频道列表最大宽度，可以避免最后一个频道被按钮覆盖住*/
   }
 }
 </style>
