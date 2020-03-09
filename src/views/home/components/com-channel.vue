@@ -31,8 +31,11 @@
         </div>
         <!--van-grid 没有设置column-num属性，默认是4列-->
         <van-grid class="channel-content" :gutter="10" clickable>
-          <van-grid-item v-for="value in 8" :key="value">
-            <span class="text">文字</span>
+          <van-grid-item v-for="(item,k) in channelList" :key="item.id">
+            <span class="text"
+              :style="{color:k===activeChannelIndex?'red':''}">
+              {{item.name}}
+            </span>
             <!-- <van-icon class="close-icon" name="close" /> -->
           </van-grid-item>
         </van-grid>
@@ -60,11 +63,23 @@
 <script>
 export default {
   name: 'com-channel',
-  // 接收v-model的数据信息
   props: {
+    // 接收v-model的数据信息
     value: {
       type: Boolean,
       default: false
+    },
+    // 接收“我的频道”数据
+    channelList: {
+      type: Array,
+      // 注意：默认值是数组，必须使用function定义
+      //       如下是箭头函数，return 一个 [] 空数组
+      default: () => []
+    },
+    // 激活频道的下标序号
+    activeChannelIndex: {
+      type: Number,
+      default: 0
     }
   }
 }

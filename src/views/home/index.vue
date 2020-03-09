@@ -19,8 +19,14 @@
       </van-tab>
     </van-tabs>
 
-    <!-- 应用频道子组件弹出层 -->
-    <com-channel v-model="showPopup"></com-channel>
+    <!--
+      应用频道子组件弹出层
+      把“我的频道”数据传递给子组件
+      传递"激活频道"的下标信息
+    -->
+    <com-channel v-model="showPopup" :channelList="channelList"
+    :activeChannelIndex="activeChannelIndex"
+    ></com-channel>
   </div>
 </template>
 
