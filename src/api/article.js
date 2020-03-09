@@ -11,7 +11,7 @@ import request from '@/utils/request.js'
  * @param {被举报类型标志} type
  * @param {相关说明，非必须的} remark
  */
-export function apiArticleReport ({ articleID, type, remark }) {
+export function apiArticleReport ({ articleID, type, remark = '' }) {
   return request({
     url: '/app/v1_0/article/reports',
     method: 'post',
