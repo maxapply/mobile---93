@@ -43,8 +43,10 @@
               class="close-icon" 设置样式的
               v-show="k>0" 使得 推荐 项目不显示叉号按钮
               isEdit: 表示进入编辑状态，才显示该图标
+              userToRest(item {id:xx,name:xx} 用户持久删除, k 项目下标序号 内存删除)
             -->
-            <van-icon v-show="k>0 && isEdit" class="close-icon" name="close" />
+            <van-icon v-show="k>0 && isEdit" class="close-icon" name="close"
+              @click="userToRest(item,k)" />
           </van-grid-item>
         </van-grid>
       </div>
@@ -74,7 +76,7 @@
 
 <script>
 // 导入获得频道的api函数:全部频道、添加频道
-import { apiChannelAll, apiChannelAdd } from '@/api/channel.js'
+import { apiChannelAll, apiChannelAdd, apiChannelDel } from '@/api/channel.js'
 export default {
   name: 'com-channel',
   // 计算属性有缓存，相关data不变化，"结果"会缓存，提升系统性能
@@ -111,6 +113,27 @@ export default {
     this.getChannelAll()
   },
   methods: {
+    // 删除频道(我的频道----->剩余频道)
+    // @param channel 被删除的频道 {id:xx,name:xx}
+    // @param index 被删除频道在我的频道列表中的下标序号
+    userToRest (channel, index) {
+      // 1. 对channelList做页面内存级删除，使得有响应式效果
+      //  A. 我的频道立即呈现删除效果，
+      //  B. 剩余频道会增加删除的项目，
+      //  C. 父页面home/index.vue也会体现删除效果)
+      this.channelList.splice(index, 1)
+      // 2. localStorage持久删除,f5刷新页面，被删除的数据也不出现了
+      apiChannelDel(channel)
+
+      // 判断删除的如果是最后一个项目，并且还有被激活，就设置前一个项目激活
+      if (index === this.channelList.length && this.activeChannelIndex === index) {
+        // console.log('前一个项目被激活选中')
+        // 设置activeChannelIndex = index-1
+        // 当前子组件要去修改父组件的成员属性
+        this.$emit('update:activeChannelIndex', index - 1)
+      }
+    },
+
     // 添加频道(剩余频道---->我的频道)
     // @param channel:被添加的频道 {id:xx,name:xx} 对象
     restToUser (channel) {
