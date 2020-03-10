@@ -49,7 +49,11 @@
           </div>
         </div>
         <van-grid class="channel-content" :gutter="10" clickable>
-          <van-grid-item v-for="item in restChannel" :key="item.id">
+          <!-- @click声明事件，使得推荐频道 被单击可以添加给 我的频道
+              同时传递item参数，{id:xx,name:xx} 是对象
+          -->
+          <van-grid-item v-for="item in restChannel" :key="item.id"
+            @click="restToUser(item)">
             <div class="info">
               <span class="text">{{item.name}}</span>
             </div>
@@ -61,8 +65,8 @@
 </template>
 
 <script>
-// 导入获得频道的api函数:全部频道
-import { apiChannelAll } from '@/api/channel.js'
+// 导入获得频道的api函数:全部频道、添加频道
+import { apiChannelAll, apiChannelAdd } from '@/api/channel.js'
 export default {
   name: 'com-channel',
   // 计算属性有缓存，相关data不变化，"结果"会缓存，提升系统性能
@@ -98,6 +102,21 @@ export default {
     this.getChannelAll()
   },
   methods: {
+    // 添加频道(剩余频道---->我的频道)
+    // @param channel:被添加的频道 {id:xx,name:xx} 对象
+    restToUser (channel) {
+      // 1. 对“我的频道channelList”成员属性进行添加，使得发生响应式，页面可以看到
+      //    channelList是"我的频道"，是父组件给传递过来的，我们要直接对其进行操作
+      //    当前组件通过props接收的，其本身还是一个"对象[{},{},{}..]"
+      //    父子组件传递对象是"引用方式"：
+      //               父、子组件是同一个对象的不同名称引用而已
+      //               子组件修改了该对象，父组件也会感知到
+      //    结论：添加好的频道 在 home/index.vue 的标签页上页会立即显示
+      //    (父、子组件应用的数据，都是内存，页面刷新后，新添加的就没有了)
+      this.channelList.push(channel)
+      // 2. localStorage持久添加，完成此步骤后，新添加的数据就不会丢失了（即使刷新页面）
+      apiChannelAdd(channel)
+    },
     // 获得"全部"频道数据
     async getChannelAll () {
       const result = await apiChannelAll()
