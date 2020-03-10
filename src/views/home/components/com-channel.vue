@@ -18,6 +18,7 @@
       closeable
       close-icon-position="top-left"
       round
+      @closed="isEdit=false"
     >
       <div class="channel">
         <div class="channel-head">
@@ -26,7 +27,9 @@
             <span class="desc">点击进入频道</span>
           </div>
           <div>
-            <van-button type="danger" plain size="mini" round>编辑</van-button>
+            <van-button type="danger" plain size="mini" round @click="isEdit=!isEdit">
+              {{isEdit?'完成':'编辑'}}
+            </van-button>
           </div>
         </div>
         <!--van-grid 没有设置column-num属性，默认是4列-->
@@ -36,7 +39,12 @@
               :style="{color:k===activeChannelIndex?'red':''}">
               {{item.name}}
             </span>
-            <!-- <van-icon class="close-icon" name="close" /> -->
+            <!-- 删除的叉号图标标志
+              class="close-icon" 设置样式的
+              v-show="k>0" 使得 推荐 项目不显示叉号按钮
+              isEdit: 表示进入编辑状态，才显示该图标
+            -->
+            <van-icon v-show="k>0 && isEdit" class="close-icon" name="close" />
           </van-grid-item>
         </van-grid>
       </div>
@@ -94,6 +102,7 @@ export default {
   },
   data () {
     return {
+      isEdit: false, // 是否是编辑状态 true/false
       channelAll: [] // 全部频道数据
     }
   },
@@ -169,6 +178,7 @@ export default {
     .active {
       color: red;
     }
+    // 删除频道叉号图标的样式
     .close-icon {
       font-size: 20px;
       position: absolute;
