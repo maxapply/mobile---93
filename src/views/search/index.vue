@@ -20,6 +20,8 @@
 </template>
 
 <script>
+// 获得联想建议数据api
+import {apiSearchSugguestion}
 export default {
   name: 'search-index',
   data () {
