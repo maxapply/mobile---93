@@ -11,6 +11,34 @@ const CHANNEL_KEY_TRAVEL = 'hm-channel-travel' // 游客key
 const CHANNEL_KET_VIP = 'hm-channel-vip' // 登录用户Key
 
 /**
+ * 删除频道
+ * @param {被删除的频道,对象} channel {id:xx, name:xx}
+ */
+export async function apiChannelDel (channel) {
+  // 判断用户是否登录，获得对象key
+  const key = store.state.user.token ? CHANNEL_KET_VIP : CHANNEL_KEY_TRAVEL
+
+  // 1. 从localStorage里边获得目前拥有的频道
+  // [{id:xx,name:xx},{id:xx,name:xx}……]  数组对象集
+  const cacheChannels = JSON.parse(localStorage.getItem(key))
+
+  // 2. 对拥有的频道做删除操作，从cacheChannels里边去除channel项目
+  //    对"拥有的频道"做过滤，遍历，把 channel 给滤掉
+  //    数组.filter(function(item){}回调函数参数)
+  const tmpChannels = cacheChannels.filter(item => {
+    // item: 代表遍历出来的每个数组元素单元
+    // 判断当前项目如果“不是” channel 就收集,
+    // 内部return接收true就收集当前数值元素项目，接收false就抛弃
+    return channel.id !== item.id
+  })
+
+  // 3. 把删除后的剩余我的频道数据再存储给localStorage
+  localStorage.setItem(key, JSON.stringify(tmpChannels))
+
+  return null
+}
+
+/**
  * 添加频道
  * @param {被添加的频道,对象} channel  {id:xx, name:xx}
  * 潜规则，api函数返回结果就是“Promise对象”(根据之前封装axios来的)
