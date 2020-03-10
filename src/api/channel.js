@@ -9,6 +9,31 @@ import store from '@/store/index.js'
 // 本地持久化存储频道设置的key(游客 和 登录用户 分别设置)
 const CHANNEL_KEY_TRAVEL = 'hm-channel-travel' // 游客key
 const CHANNEL_KET_VIP = 'hm-channel-vip' // 登录用户Key
+
+/**
+ * 添加频道
+ * @param {被添加的频道,对象} channel  {id:xx, name:xx}
+ * 潜规则，api函数返回结果就是“Promise对象”(根据之前封装axios来的)
+ * 处理：async + return
+ */
+export async function apiChannelAdd (channel) {
+  // 判断用户是否登录，获得对象key
+  const key = store.state.user.token ? CHANNEL_KET_VIP : CHANNEL_KEY_TRAVEL
+
+  // 从localStorage里边把已经拥有的频道获得出来,String--->Object
+  // [{id:xx,name:xx},{id:xx,name:xx}……]  数组对象集
+  const cacheChannels = JSON.parse(localStorage.getItem(key))
+  // 对 获取出来的频道 做添加操作，push
+  cacheChannels.push(channel)
+  // 再把添加好的“总的频道列表”数据 维护到localStorage里边去
+  localStorage.setItem(key, JSON.stringify(cacheChannels))
+
+  // 上述代码都是非常ok的，本身不需要返回任何信息(应用端也不需要)，就返回null即可
+  // 应用端： const rst = await apiChannelAdd(xx)
+  //          console.log(rst) null
+  return null
+}
+
 /**
  * 获取用户的频道列表数据
  * 一般数据获取请求方式都是get
