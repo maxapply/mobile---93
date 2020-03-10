@@ -34,7 +34,15 @@
         </div>
         <!--van-grid 没有设置column-num属性，默认是4列-->
         <van-grid class="channel-content" :gutter="10" clickable>
-          <van-grid-item v-for="(item,k) in channelList" :key="item.id">
+          <!-- click设置频道被单击的执行逻辑
+              1. 弹出层关闭
+              2. 当前频道激活
+              // 注意：要传递下标序号参数
+              兼顾删除，需要传递频道item参数
+           -->
+          <van-grid-item v-for="(item,k) in channelList" :key="item.id"
+            @click="clkChannel(item,k)"
+          >
             <span class="text"
               :style="{color:k===activeChannelIndex?'red':''}">
               {{item.name}}
@@ -113,6 +121,20 @@ export default {
     this.getChannelAll()
   },
   methods: {
+    // 我的频道 被单击激活
+    clkChannel (channel, index) {
+      // 如果是编辑状态，并且不是推荐项目，就执行删除逻辑
+      if (this.isEdit && index > 0) {
+        // return 停止后续代码执行
+        return this.userToRest(channel, index)
+      }
+
+      // 1. 弹出层关闭(借助父组件的v-model使得本身弹出层关闭)
+      this.$emit('input', false)
+      // 2. 当前频道激活，子要修改父的activeChannelIndex成员，使得激活项目变化
+      this.$emit('update:activeChannelIndex', index)
+    },
+
     // 删除频道(我的频道----->剩余频道)
     // @param channel 被删除的频道 {id:xx,name:xx}
     // @param index 被删除频道在我的频道列表中的下标序号
