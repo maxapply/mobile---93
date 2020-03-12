@@ -10,19 +10,54 @@
       .trim: 是vue框架修饰符，要去除内容左右空白
       @search: 搜索框单击“回车按钮”的事件触发
     -->
-    <van-search v-model.trim="searchText" placeholder="请输入搜索关键词"
-      @search="$router.push('/search/result/'+searchText)"/>
-    <van-cell-group>
+    <van-search
+      v-model.trim="searchText"
+      placeholder="请输入搜索关键词"
+      @search="onSearch(searchText)"
+    />
 
-        <!-- 联想关键字内容展示列表 -->
-      <van-cell icon="search" v-for="(item,k) in suggestionList" :key="k"
-        @click="$router.push('/search/result/'+item)"
+    <van-cell-group v-if="suggestionList.length>0">
+      <!-- 即时联想数据 -->
+      <!-- 联想关键字内容展示列表 -->
+      <van-cell
+        icon="search"
+        v-for="(item,k) in suggestionList"
+        :key="k"
+        @click="onSearch(item)"
       >
         <!-- 应为要应用methods方法，并且该方法返回的信息里边有 html标签+css样式
-        所以不要直接使用title属性，相反要应用命名插槽，内部结合v-html应用 -->
+        所以不要直接使用title属性，相反要应用命名插槽，内部结合v-html应用-->
         <div slot="title" v-html="highLightCell(item,searchText)"></div>
       </van-cell>
-
+    </van-cell-group>
+    <van-cell-group v-else>
+      <!-- 历史联想数据 -->
+      <!-- 历史联想记录 -->
+      <van-cell title="历史记录">
+        <!-- 删除图标
+          slot="right-icon" 命名插槽 给 cell单元格的右边显示内容(垃圾桶图标)
+          name="delete" 垃圾桶图标
+          style="line-height:inherit" 设置内容高度与父级一致
+        -->
+        <van-icon
+          name="delete"
+          @click="isDeleteData=true"
+          v-show="!isDeleteData"
+          slot="right-icon"
+          style="line-height:inherit"
+        ></van-icon>
+        <!-- slot="default" 命名插槽  给单元格定义右侧内容 -->
+        <div v-show="isDeleteData" slot="default">
+          <span style="margin-right:10px">全部删除</span>
+          <span @click="isDeleteData=false">完成</span>
+        </div>
+      </van-cell>
+      <!-- 历史联想项目数据展示 -->
+      <van-cell title="hello111">
+        <!-- 删除按钮 -->
+        <van-icon v-show="isDeleteData" slot="right-icon"
+        name="close" style="line-height:inherit"></van-icon>
+      </van-cell>
     </van-cell-group>
   </div>
 </template>
@@ -61,11 +96,20 @@ export default {
   },
   data () {
     return {
+      // 联想历史记录是否进入删除状态,true删除状态[全部删除、完成、叉号]，false正常状态[垃圾桶]
+      isDeleteData: false,
       suggestionList: [], // 联想建议数据列表
       searchText: '' // 用户输入的搜索关键字
     }
   },
   methods: {
+    // 根据关键字要跳转执行，检索展示文章
+    // kw：代表检索关键字
+    onSearch (kw) {
+      // 可以统一对kw关键字做收集存储工作
+
+      this.$router.push('/search/result/' + kw)
+    },
     // 关键字高亮设置
     // content: 要高亮设置的目标内容[vue本地项目]
     // keywords: 被匹配的关键字[Vue]
