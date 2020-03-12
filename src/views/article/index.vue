@@ -11,7 +11,7 @@
           <p class="time">{{article.pubdate | formatTime}}</p>
         </div>
         <!-- 注意：关注和取消关注 通过一个click事件触发执行 -->
-        <van-button round size="small" type="info" @click="followMe()">{{article.is_followed?'取消关注':'+ 关注'}}</van-button>
+        <van-button round size="small" type="info" @click="followMe()" :loading="followLoading">{{article.is_followed?'取消关注':'+ 关注'}}</van-button>
       </div>
       <div class="content">
         <p v-html="article.content"></p>
@@ -54,6 +54,7 @@ export default {
   name: 'article-index',
   data () {
     return {
+      followLoading: false, // 关注期间按钮动画效果
       // 只是声明一个普通的空对象，是临时的，这个对象在模板中不输出，就可以用null
       // 模板展示的是要用{}的
       // data成员不要使用null
@@ -66,6 +67,12 @@ export default {
   methods: {
     // (取消)关注设置
     async followMe () {
+      // 开启加载动画
+      this.followLoading = true
+
+      // 延迟时间
+      await this.$sleep(1000)
+
       // 判断
       if (this.article.is_followed) {
         // 取消关注(成功率100%)
@@ -75,15 +82,18 @@ export default {
       } else {
         // 关注(不是都成功，自己关注自己要失败，要做相关处理)
         try {
-          await apiUserFollow(this.article.aut_id.toString())
+          await apiUserFollow(this.article.aut_id.toString()) // 有可能有错误
+          this.article.is_followed = true // 不会有错误
         } catch (err) {
           if (err.response.status === 400) {
             // return 就是停止后续代码执行
-            return this.$toast.fail('自己不能关注自己！')
+            this.$toast.fail('自己不能关注自己！')
+          } else {
+            this.$toast.fail('关注失败，请联系管理员')
           }
-          return this.$toast.fail('关注失败，请联系管理员')
         }
-        this.article.is_followed = true
+        // 回复按钮状态
+        this.followLoading = false
       }
     },
     // 获得文章详情
