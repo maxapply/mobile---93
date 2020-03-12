@@ -8,12 +8,16 @@
     <van-nav-bar title="搜索中心" left-arrow @click-left="$router.back()"/>
     <!-- 搜索输入框
       .trim: 是vue框架修饰符，要去除内容左右空白
+      @search: 搜索框单击“回车按钮”的事件触发
     -->
-    <van-search v-model.trim="searchText" placeholder="请输入搜索关键词"/>
+    <van-search v-model.trim="searchText" placeholder="请输入搜索关键词"
+      @search="$router.push('/search/result/'+searchText)"/>
     <van-cell-group>
 
         <!-- 联想关键字内容展示列表 -->
-      <van-cell icon="search" v-for="(item,k) in suggestionList" :key="k">
+      <van-cell icon="search" v-for="(item,k) in suggestionList" :key="k"
+        @click="$router.push('/search/result/'+item)"
+      >
         <!-- 应为要应用methods方法，并且该方法返回的信息里边有 html标签+css样式
         所以不要直接使用title属性，相反要应用命名插槽，内部结合v-html应用 -->
         <div slot="title" v-html="highLightCell(item,searchText)"></div>

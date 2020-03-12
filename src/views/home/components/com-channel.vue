@@ -9,6 +9,14 @@
           closeable  有关闭按钮
           close-icon-position="top-left"  按钮在左上角显示
           round 有圆角
+
+          van-popup内部有封装：
+          @input="$emit('input',$event)"
+          就代表
+          @input="$emit('input',$event.target.value)"
+          在van-popup内部不能直接使用$event.target.value
+          因为其是组件，不是普通表单域
+          $event是"事件对象"，是Vue语法
     -->
     <van-popup
       :value="value"
