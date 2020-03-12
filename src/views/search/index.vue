@@ -53,7 +53,7 @@
         </div>
       </van-cell>
       <!-- 历史联想项目数据展示 -->
-      <van-cell title="hello111">
+      <van-cell :title="item" v-for="(item,k) in suggestHistories" :key="k">
         <!-- 删除按钮 -->
         <van-icon v-show="isDeleteData" slot="right-icon"
         name="close" style="line-height:inherit"></van-icon>
@@ -65,6 +65,9 @@
 <script>
 // 获得联想建议数据api
 import { apiSearchSuggestion } from '@/api/search.js'
+
+// 创建常量，配置历史关键字的key名称，方便后续开发
+const SH = 'suggest-histories'
 
 export default {
   name: 'search-index',
@@ -96,6 +99,9 @@ export default {
   },
   data () {
     return {
+      // 从localStorage获取已经存储好的关键字信息
+      // localStorage存储关键字的样子： ['vue','jquery','python'……]
+      suggestHistories: JSON.parse(localStorage.getItem(SH) || '[]'),
       // 联想历史记录是否进入删除状态,true删除状态[全部删除、完成、叉号]，false正常状态[垃圾桶]
       isDeleteData: false,
       suggestionList: [], // 联想建议数据列表
@@ -107,6 +113,21 @@ export default {
     // kw：代表检索关键字
     onSearch (kw) {
       // 可以统一对kw关键字做收集存储工作
+      if (!kw) {
+        // 没有输入任何关键字，禁止文章检索
+        return false
+      }
+
+      // 把当前的kw关键字存储起来，还要考虑去除重复
+      // 把现在的关键字转为Set结合
+      const st = new Set(this.suggestHistories)
+      // 对set做添加操作(自动去重)
+      st.add(kw)
+      // 对添加好的关键字集合转换为Array数组,并赋予给suggestHistories的data成员
+      // 有响应式效果
+      this.suggestHistories = Array.from(st)
+      // localStorage维护目前最新的关键字数组
+      localStorage.setItem(SH, JSON.stringify(this.suggestHistories))
 
       this.$router.push('/search/result/' + kw)
     },
