@@ -40,7 +40,9 @@ const routes = [
     component: () => import('@/views/user/login.vue') // 登录
   },
   {
-    path: '/article',
+    // 当前路由有参数，名称为aid
+    path: '/article/:aid', // $router.push('/article/xxx') 该代码不太好维护
+    name: 'article', // $router.push({name:'article',params:{aid:xx,aa:123,bb:456}}) 该代码更容易维护
     component: () => import('@/views/article/index.vue') // 文章详情
   },
   {

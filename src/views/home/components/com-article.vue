@@ -15,7 +15,8 @@
       v-model="isLoading"
       @refresh="onRefresh"
       :success-text="successText"
-      success-duration="1500">
+      success-duration="1500"
+    >
       <!-- 瀑布流加载效果实现
             瀑布流执行：
             1. 页面加载完毕，其会自动执行
@@ -42,7 +43,12 @@
               模板中应用超大整型数据，需要通过toString转换为"字符串"
         -->
         <!-- <van-cell v-for="item in list" :key="item" :title="item"/> -->
-        <van-cell v-for="item in articleList" :key="item.art_id.toString()" :title="item.title">
+        <van-cell
+          v-for="item in articleList"
+          :key="item.art_id.toString()"
+          :title="item.title"
+          @click="$router.push({name:'article',params:{aid:item.art_id.toString()}})"
+        >
           <!-- 通过命名插槽方式体现单元格下方描述信息 -->
           <template slot="label">
             <!-- 新闻封面图片也是通过label描述位置体现
@@ -64,20 +70,22 @@
                   设置lazy-load  "指令"，使得图片有懒加载功能
                   lazy-load  或  :lazy-load="true"  都是表示该属性接收为true的信息
                 -->
-                <van-image
-                  width="85"
-                  height="85"
-                  :src="item.cover.images[item2-1]"
-                  lazy-load
-                />
+                <van-image width="85" height="85" :src="item.cover.images[item2-1]" lazy-load/>
               </van-grid-item>
             </van-grid>
             <p>
               <!-- name="close"代表叉号
                 item.art_id.toString() 代表被处理的文章id信息
+                外部已经有click事件了，内部还有click事件
+                内部的click执行的时候，外部也会执行，导致内部失效，这是事件冒泡体现
+                处理：阻止事件冒泡
+                .stop是vue内部的修饰符，可以阻止事件冒泡
               -->
-              <van-icon name="close" style="float:right;"
-                @click="displayDialog(item.art_id.toString())" />
+              <van-icon
+                name="close"
+                style="float:right;"
+                @click.stop="displayDialog(item.art_id.toString())"
+              />
 
               <span>作者:{{item.aut_name}}</span>
               &nbsp;
@@ -104,8 +112,7 @@
       v-model="showDialog"
       :articleID="nowArticleID"
       @dislikeSuccess="handleDislikeSuccess()"
-      ></more-action>
-
+    ></more-action>
   </div>
 </template>
 
@@ -160,7 +167,7 @@ export default {
       // 1. 获得目标文章id在文章列表中的下标序号
       //    findIndex()是数组的一个方法，可以通过条件获得指定目标在数组列表中的"下标序号"，有遍历机制
       // 各种底层方法api：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide
-      const index = this.articleList.findIndex((item) => {
+      const index = this.articleList.findIndex(item => {
         // 满足条件就return为true信息出来，那么当前项目的下标序号就获得的到了
         return item.art_id.toString() === this.nowArticleID
       })
