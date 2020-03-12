@@ -92,9 +92,9 @@ export default {
             this.$toast.fail('关注失败，请联系管理员')
           }
         }
-        // 回复按钮状态
-        this.followLoading = false
       }
+      // 恢复按钮状态
+      this.followLoading = false
     },
     // 获得文章详情
     async getArticleDetail () {
