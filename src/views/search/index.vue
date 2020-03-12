@@ -10,21 +10,12 @@
       .trim: 是vue框架修饰符，要去除内容左右空白
       @search: 搜索框单击“回车按钮”的事件触发
     -->
-    <van-search
-      v-model.trim="searchText"
-      placeholder="请输入搜索关键词"
-      @search="onSearch(searchText)"
-    />
+    <van-search v-model.trim="searchText" placeholder="请输入搜索关键词" @search="onSearch(searchText)"/>
 
     <van-cell-group v-if="suggestionList.length>0">
       <!-- 即时联想数据 -->
       <!-- 联想关键字内容展示列表 -->
-      <van-cell
-        icon="search"
-        v-for="(item,k) in suggestionList"
-        :key="k"
-        @click="onSearch(item)"
-      >
+      <van-cell icon="search" v-for="(item,k) in suggestionList" :key="k" @click="onSearch(item)">
         <!-- 应为要应用methods方法，并且该方法返回的信息里边有 html标签+css样式
         所以不要直接使用title属性，相反要应用命名插槽，内部结合v-html应用-->
         <div slot="title" v-html="highLightCell(item,searchText)"></div>
@@ -48,15 +39,20 @@
         ></van-icon>
         <!-- slot="default" 命名插槽  给单元格定义右侧内容 -->
         <div v-show="isDeleteData" slot="default">
-          <span style="margin-right:10px">全部删除</span>
+          <span style="margin-right:10px" @click="suggestDelAll()">全部删除</span>
           <span @click="isDeleteData=false">完成</span>
         </div>
       </van-cell>
       <!-- 历史联想项目数据展示 -->
       <van-cell :title="item" v-for="(item,k) in suggestHistories" :key="k">
         <!-- 删除按钮 -->
-        <van-icon v-show="isDeleteData" slot="right-icon"
-        name="close" style="line-height:inherit"></van-icon>
+        <van-icon
+          v-show="isDeleteData"
+          slot="right-icon"
+          name="close"
+          style="line-height:inherit"
+          @click="suggestDel(k)"
+        ></van-icon>
       </van-cell>
     </van-cell-group>
   </div>
@@ -109,6 +105,21 @@ export default {
     }
   },
   methods: {
+    // 删除全部关键字项目
+    suggestDelAll () {
+      // 1. 页面级，响应式效果
+      this.suggestHistories = []
+      // 2. 持久级localStorage
+      localStorage.removeItem(SH)
+    },
+    // 删除单个关键字项目
+    // index: 被删除项目在列表数组中的下标
+    suggestDel (index) {
+      // 1. 页面级，响应式效果
+      this.suggestHistories.splice(index, 1)
+      // 2. 持久级localStorage
+      localStorage.setItem(SH, JSON.stringify(this.suggestHistories))
+    },
     // 根据关键字要跳转执行，检索展示文章
     // kw：代表检索关键字
     onSearch (kw) {
