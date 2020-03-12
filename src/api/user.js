@@ -2,6 +2,31 @@
 // request就是经过各种初始配置的axios对象，可以直接使用
 import request from '@/utils/request.js'
 
+/**
+ * 针对某个作者进行关注
+ * @param {被关注作者的id} target
+ */
+export function apiUserFollow (target) {
+  return request({
+    url: '/app/v1_0/user/followings',
+    method: 'post',
+    data: {
+      target
+    }
+  })
+}
+
+/**
+ * 针对某个作者进行取消关注
+ * @param {被取消关注作者的id} target
+ */
+export function apiUserUnfollow (target) {
+  return request({
+    url: '/app/v1_0/user/followings/' + target,
+    method: 'delete'
+  })
+}
+
 // 导出一个函数，可以对用户账号进行校验
 // data: {mobile:xx, code:xx} 对象参数
 // 现在对data做升级，使得在没有任何注释信息的条件下，也直接知道当前api函数需要什么参数，提高开发效率

@@ -10,7 +10,8 @@
           <p class="name">{{article.aut_name}}</p>
           <p class="time">{{article.pubdate | formatTime}}</p>
         </div>
-        <van-button round size="small" type="info">{{article.is_followed?'取消关注':'+ 关注'}}</van-button>
+        <!-- 注意：关注和取消关注 通过一个click事件触发执行 -->
+        <van-button round size="small" type="info" @click="followMe()">{{article.is_followed?'取消关注':'+ 关注'}}</van-button>
       </div>
       <div class="content">
         <p v-html="article.content"></p>
@@ -43,6 +44,8 @@
 </template>
 
 <script>
+// 关注相关api
+import { apiUserFollow, apiUserUnfollow } from '@/api/user.js'
 // 文章详情api
 import { apiArticleDetail } from '@/api/article.js'
 export default {
@@ -61,6 +64,28 @@ export default {
     this.getArticleDetail()
   },
   methods: {
+    // (取消)关注设置
+    async followMe () {
+      // 判断
+      if (this.article.is_followed) {
+        // 取消关注(成功率100%)
+        await apiUserUnfollow(this.article.aut_id.toString())
+        // 页面更新数据，使得响应式执行
+        this.article.is_followed = false
+      } else {
+        // 关注(不是都成功，自己关注自己要失败，要做相关处理)
+        try {
+          await apiUserFollow(this.article.aut_id.toString())
+        } catch (err) {
+          if (err.response.status === 400) {
+            // return 就是停止后续代码执行
+            return this.$toast.fail('自己不能关注自己！')
+          }
+          return this.$toast.fail('关注失败，请联系管理员')
+        }
+        this.article.is_followed = true
+      }
+    },
     // 获得文章详情
     async getArticleDetail () {
       const result = await apiArticleDetail(this.$route.params.aid)
