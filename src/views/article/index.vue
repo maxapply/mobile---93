@@ -37,10 +37,30 @@
 </template>
 
 <script>
+// 文章详情api
+import { apiArticleDetail } from '@/api/article.js'
 export default {
   // 每个组件name声明的名字【不要】与html标签重名，
   // 例如div、span、table，article、header、footer
-  name: 'article-index'
+  name: 'article-index',
+  data () {
+    return {
+      // 只是声明一个普通的空对象，是临时的，这个对象在模板中不输出，就可以用null
+      // 模板展示的是要用{}的
+      // data成员不要使用null
+      article: {} // vue声明空对象，最好使用{},不要用null，与响应式有点冲突
+    }
+  },
+  created () {
+    this.getArticleDetail()
+  },
+  methods: {
+    // 获得文章详情
+    async getArticleDetail () {
+      const result = await apiArticleDetail(this.$route.params.aid)
+      this.article = result
+    }
+  }
 }
 </script>
 
