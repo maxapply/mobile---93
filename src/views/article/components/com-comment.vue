@@ -130,6 +130,13 @@ export default {
         return false
       }
 
+      // 按钮处于加载状态
+      // 注意：不要放到延迟器下边
+      this.submitting = true
+
+      // 延迟器
+      await this.$sleep(800)
+
       if (this.showReply) {
         // 【添加回复】 target: 当前激活评论id，artID：文章id
         const result = await apiAddCorR({
@@ -163,6 +170,8 @@ export default {
       }
       // 清除添加的表单域信息
       this.contentCorR = ''
+      // 恢复按钮为正常状态
+      this.submitting = false
     },
     // 开启 回复弹出层 逻辑
     // comID: 当前被单击查看的目标评论id
