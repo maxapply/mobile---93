@@ -3,6 +3,16 @@
 import request from '@/utils/request.js'
 
 /**
+ * 个人中心：获得用户基本信息
+ */
+export function apiUserInfo () {
+  return request({
+    url: '/app/v1_0/user',
+    method: 'get'
+  })
+}
+
+/**
  * 针对某个作者进行关注
  * @param {被关注作者的id} target
  */
