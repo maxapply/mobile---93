@@ -4,8 +4,8 @@
     <!--具体布局内容-->
     <div class="user-profile">
       <div class="info">
-        <van-image round src="https://img.yzcdn.cn/vant/cat.jpeg"/>
-        <h3 class="name">我是华仔
+        <van-image round :src="userinfo.photo"/>
+        <h3 class="name">{{userinfo.name}}
           <br>
           <van-tag size="mini">申请认证</van-tag>
         </h3>
@@ -18,19 +18,19 @@
       -->
       <van-row>
         <van-col span="6">
-          <p>0</p>
+          <p>{{userinfo.art_count}}</p>
           <p>动态</p>
         </van-col>
         <van-col span="6">
-          <p>0</p>
+          <p>{{userinfo.follow_count}}</p>
           <p>关注</p>
         </van-col>
         <van-col span="6">
-          <p>0</p>
+          <p>{{userinfo.fans_count}}</p>
           <p>粉丝</p>
         </van-col>
         <van-col span="6">
-          <p>0</p>
+          <p>{{userinfo.like_count}}</p>
           <p>被赞</p>
         </van-col>
       </van-row>
@@ -51,15 +51,47 @@
       <van-cell icon="edit" title="编辑资料" to="/user/profile" is-link/>
       <van-cell icon="chat-o" title="小智同学" to="/user/chat" is-link/>
       <van-cell icon="setting-o" title="系统设置" is-link/>
-      <van-cell icon="warning-o" title="退出登录" to="/login" is-link/>
+      <van-cell icon="warning-o" title="退出登录" @click="logout()" is-link/>
     </van-cell-group>
   </div>
 
 </template>
 
 <script>
+// 用户基本信息api
+import { apiUserInfo } from '@/api/user.js'
 export default {
-  name: 'user-index'
+  name: 'user-index',
+  data () {
+    return {
+      userinfo: {} // 用户信息
+    }
+  },
+  created () {
+    this.getUserInfo()
+  },
+  methods: {
+    // 退出系统
+    logout () {
+      // 确认框
+      this.$dialog.confirm({
+        // title: '标题',
+        message: '确认要退出系统么？'
+      }).then(() => {
+        // 单击确定按钮后处理
+        // 清除vuex用户数据
+        this.$store.commit('clearUser')
+        // 跳转到登录页面
+        this.$router.push('/login')
+      }).catch(() => {
+        // 单击取消按钮的逻辑
+      })
+    },
+    // 获得用户信息
+    async getUserInfo () {
+      this.userinfo = await apiUserInfo()
+    }
+  }
 }
 </script>
 
