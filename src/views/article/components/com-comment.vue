@@ -77,15 +77,15 @@
     <div class="reply-container van-hairline--top">
       <van-field v-model.trim="contentCorR" placeholder="写评论或回复...">
         <!-- slot="button"命名插槽，表明要给van-field的指定位置填充内容，button是输入框的右侧-->
-        <van-button size="mini" :loading="submitting" slot="button">提交</van-button>
+        <van-button size="mini" :loading="submitting" slot="button" @click="add()">提交</van-button>
       </van-field>
     </div>
   </div>
 </template>
 
 <script>
-// 回复列表api
-import { apiReplyList } from '@/api/reply.js'
+// 回复列表api、添加评论或回复
+import { apiReplyList, apiAddCorR } from '@/api/reply.js'
 // 评论列表api
 import { apiCommentList } from '@/api/comment.js'
 export default {
@@ -121,6 +121,49 @@ export default {
     }
   },
   methods: {
+    // 添加评论或回复
+    // 如何判断当前要做"评论"还是"回复",判断showReply:true回复     false评论
+    async add () {
+      // 空的数据不给与处理
+      if (!this.contentCorR) {
+        this.$toast.fail('请输入一些内容！')
+        return false
+      }
+
+      if (this.showReply) {
+        // 【添加回复】 target: 当前激活评论id，artID：文章id
+        const result = await apiAddCorR({
+          target: this.commentID,
+          content: this.contentCorR,
+          artID: this.$route.params.aid
+        })
+        // 把添加好的回复信息，追加到回复列表里边，replyList，unshift头部追加
+        // 引用的名称为"new_obj"，代表添加好的完成回复记录信息
+        this.replyList.unshift(result.new_obj)
+
+        // 获得当前评论的下标信息
+        // findIndex()遍历数组，根据条件找到某个元素的下标
+        const index = this.commentList.findIndex(item => {
+          // item:代表每个数组元素
+          // 条件是：item.com_id.toString()===this.commentID
+          return item.com_id.toString() === this.commentID
+        })
+        // 通过index找到目标评论，对reply_count做累加
+        this.commentList[index].reply_count++
+      } else {
+        // 【添加评论】 target:文章id(来自路由参数)
+        const result = await apiAddCorR({
+          target: this.$route.params.aid,
+          content: this.contentCorR
+        })
+        // console.log(result)
+        // 新添加的评论的完成记录，会被服务器端返回回来，引用的名称为new_obj
+        // 现在要把新添加好的评论放到页面上显示，就是要给 当前评论列表 做追加unshift头部
+        this.commentList.unshift(result.new_obj)
+      }
+      // 清除添加的表单域信息
+      this.contentCorR = ''
+    },
     // 开启 回复弹出层 逻辑
     // comID: 当前被单击查看的目标评论id
     openReply (comID) {
