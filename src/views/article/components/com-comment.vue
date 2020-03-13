@@ -36,7 +36,9 @@
           <p>
             <span>{{item.pubdate | formatTime}}</span>
             ·
-            <span @click="openReply(item.com_id.toString())">{{item.reply_count}}&nbsp;回复</span>
+            <span
+              @click="openReply(item.com_id.toString())"
+            >{{item.reply_count}}&nbsp;回复</span>
           </p>
         </div>
       </van-cell>
@@ -51,7 +53,7 @@
         finished-text="没有更多了"
         @load="onLoadReply"
       >
-        <van-cell v-for="item in replyList" :key="item.com_id.toString()" >
+        <van-cell v-for="item in replyList" :key="item.com_id.toString()">
           <!-- 作者头像 -->
           <div slot="icon">
             <img class="avatar" :src="item.aut_photo" alt>
@@ -71,6 +73,13 @@
       </van-list>
     </van-popup>
 
+    <!-- 添加评论或回复的表单域：html标签+css样式 -->
+    <div class="reply-container van-hairline--top">
+      <van-field v-model.trim="contentCorR" placeholder="写评论或回复...">
+        <!-- slot="button"命名插槽，表明要给van-field的指定位置填充内容，button是输入框的右侧-->
+        <van-button size="mini" :loading="submitting" slot="button">提交</van-button>
+      </van-field>
+    </div>
   </div>
 </template>
 
@@ -83,6 +92,10 @@ export default {
   name: 'com-comment',
   data () {
     return {
+      // 添加评论或回复相关-------------------------------
+      contentCorR: '', // 评论或回复的内容
+      submitting: false, // 添加动作是否正在进行
+
       // 回复相关--------------------------------------
       replyList: [], // 回复列表数据
       lastID: null, // 分页标志
@@ -182,6 +195,16 @@ export default {
     .van-cell__label {
       width: 400px;
     }
+  }
+  // 添加评论或回复构件 样式
+  .reply-container {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    height: 88px;
+    width: 100%;
+    background: #f5f5f5;
+    z-index: 9999;
   }
 }
 </style>

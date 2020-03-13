@@ -1,6 +1,25 @@
 import request from '@/utils/request.js'
 
 /**
+ * 添加评论或回复内容，一个api承接两个动作
+ * target integer 必须  评论的目标id（评论文章即为文章id，对评论进行回复则为评论id）
+ * content string 必须  评论内容
+ * art_id integer 非必须  【文章id】，添加回复，需要传递此参数
+ *                                    添加评论，不要传此参数
+ */
+export function apiAddCorR ({ target, content, artID = null }) {
+  return request({
+    url: '/app/v1_0/comments',
+    method: 'post',
+    data: {
+      target,
+      content,
+      art_id: artID
+    }
+  })
+}
+
+/**
  * 获得"评论"列表
  * type 是 c  c-对评论(comment)获取的回复列表
  * source:commentID 是  源id，评论id
