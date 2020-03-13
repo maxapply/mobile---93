@@ -2,7 +2,7 @@
   <div class="comment">
     <!--van-list：实现瀑布加载效果-->
     <van-list v-model="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
-      <van-cell v-for="item in list" :key="item">
+      <van-cell v-for="item in commentList" :key="item">
         <!-- 作者头像
           slot="icon" 是cell单元格命名插槽，自定义左侧图标
         -->
@@ -38,10 +38,17 @@
 </template>
 
 <script>
+// 评论列表api
+import { apiCommentList } from '@/api/comment.js'
 export default {
   name: 'com-comment',
   data () {
     return {
+      // 评论列表
+      commentList: [],
+      // offset不需要在模板中使用，所以可以使用null
+      offset: null, // 评论分页标志,数据偏移量
+
       // 评论瀑布相关成员
       list: [], // demo数据
       loading: false, // 瀑布动画控制
@@ -49,20 +56,28 @@ export default {
     }
   },
   methods: {
-    onLoad () {
-      // 异步更新数据
-      setTimeout(() => {
-        for (let i = 0; i < 5; i++) {
-          this.list.push(this.list.length + 1)
-        }
-        // 加载状态结束
-        this.loading = false
+    async onLoad () {
+      await this.$sleep(800)
 
-        // 数据全部加载完成
-        if (this.list.length >= 10) {
-          this.finished = true
-        }
-      }, 500)
+      // 根据文章id获得评论列表
+      const comments = await apiCommentList({
+        articleID: this.$route.params.aid,
+        offset: this.offset
+      })
+      // 瀑布动画消失
+      this.loading = false
+
+      // 判断是否有获得到评论列表
+      // comments.results: [{},{},{},……]
+      if (!comments.results.length) {
+        // 没有数据瀑布停止
+        this.finished = true
+        return false // 停止后续代码执行
+      }
+      // 有数据,给追加到 commentList成员里边
+      this.commentList.push(...comments.results)
+      // 对分页标志offset进行赋值
+      this.offset = comments.last_id
     }
   }
 }
