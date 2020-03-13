@@ -39,11 +39,16 @@
           icon="delete"
         >不喜欢</van-button>
       </div>
+
+      <!-- 评论列表，展示到文章详情区域里边 -->
+      <com-comment></com-comment>
     </div>
   </div>
 </template>
 
 <script>
+// 导入评论列表子组件
+import ComComment from './components/com-comment'
 // 关注相关api
 import { apiUserFollow, apiUserUnfollow } from '@/api/user.js'
 // 文章详情api
@@ -52,6 +57,7 @@ export default {
   // 每个组件name声明的名字【不要】与html标签重名，
   // 例如div、span、table，article、header、footer
   name: 'article-index',
+  components: { ComComment },
   data () {
     return {
       followLoading: false, // 关注期间按钮动画效果
