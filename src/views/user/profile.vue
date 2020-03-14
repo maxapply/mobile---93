@@ -1,6 +1,13 @@
 <template>
   <div class="page-user-profile">
-    <van-nav-bar left-arrow @click-left="$router.back()" title="编辑资料" right-text="保存"></van-nav-bar>
+    <!-- @click-right="saveProfile()"是van-nav-bar 给 右侧 文字信息 设置的单击事件 -->
+    <van-nav-bar
+      left-arrow
+      @click-left="$router.back()"
+      title="编辑资料"
+      right-text="保存"
+      @click-right="saveProfile()"
+    ></van-nav-bar>
     <!-- 绘制 头像、名称、性别、生日 的单元格 -->
     <van-cell-group>
       <!--
@@ -37,7 +44,7 @@
       ref和id 方式获得的元素对象本质完全一样
       上传表单域自带click，不用声明
     -->
-    <input type="file" ref="mypic" id="pic" @change="startUpload()" style="display:none;" />
+    <input type="file" ref="mypic" id="pic" @change="startUpload()" style="display:none;">
 
     <!-- 名称弹出层
         高度不配置，通过内容自动填充
@@ -83,8 +90,12 @@
 // 导入dayjs（系统依赖包，自动去node_modules下边获取）
 import dayjs from 'dayjs'
 
-// 用户资料api、上传用户头像
-import { apiUserProfile, apiUserPhoto } from '@/api/user.js'
+// 用户资料api、上传用户头像、保存用户资料
+import {
+  apiUserProfile,
+  apiUserPhoto,
+  apiUserSaveProfile
+} from '@/api/user.js'
 export default {
   name: 'user-profile',
   data () {
@@ -116,6 +127,13 @@ export default {
     this.getUserProfile()
   },
   methods: {
+    // 保存用户资料
+    async saveProfile () {
+      // 如下api成功率是100%，不用try/catch处理
+      await apiUserSaveProfile(this.userprofile)
+      this.$toast.success('更新资料成功！')
+    },
+
     // 开始上传头像
     // 头像图片选取好了，该函数会自动触发执行
     async startUpload () {

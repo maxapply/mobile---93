@@ -3,6 +3,24 @@
 import request from '@/utils/request.js'
 
 /**
+ * name string 非必须  昵称
+ * gender integer 非必须  性别，0-男，1-女
+ * birthday string 非必须  生日，格式'2018-12-20'
+ * 注意：photo头像不用处理，上传的时候都处理好了
+ */
+export function apiUserSaveProfile ({ name, gender, birthday }) {
+  return request({
+    url: '/app/v1_0/user/profile',
+    method: 'PATCH',
+    data: {
+      name,
+      gender,
+      birthday
+    }
+  })
+}
+
+/**
  * 对用户头像进行更新
  * patch：代表对众多的字段中"几个"来更新
  * put: 对"全部"字段做更新
