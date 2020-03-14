@@ -115,6 +115,9 @@ export default {
     async getUserProfile () {
       // data直接接收数据
       this.userprofile = await apiUserProfile()
+      // 把用户生日转为 new Date()  格式，赋值给 currentDate
+      // 使得选择器 默认显示
+      this.currentDate = new Date(this.userprofile.birthday)
     }
   }
 }
