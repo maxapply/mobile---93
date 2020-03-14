@@ -26,9 +26,18 @@
         高度不配置，通过内容自动填充
     -->
     <van-popup v-model="showPhoto" position="bottom">
-      <van-cell title="本地相册选择图片" is-link></van-cell>
+      <!-- 单击单元格的时候 执行了input表单的点击事件 -->
+      <van-cell title="本地相册选择图片" is-link @click="$refs.mypic.click()"></van-cell>
       <van-cell title="拍照" is-link></van-cell>
     </van-popup>
+    <!-- 隐藏状态的上传表单域
+      ref：可以这样 this.$refs.mypic  方式获得到当前input的元素对象
+      如果不通过ref，也可以通过其他方式获取，
+      例如id  document.getElementById('pic')
+      ref和id 方式获得的元素对象本质完全一样
+      上传表单域自带click，不用声明
+    -->
+    <input type="file" ref="mypic" id="pic" style="display:none;" />
 
     <!-- 名称弹出层
         高度不配置，通过内容自动填充
@@ -64,12 +73,16 @@
         :min-date="minDate"
         :max-date="maxDate"
         @confirm="onConfirm"
+        @cancel="showBirthday = false"
       />
     </van-popup>
   </div>
 </template>
 
 <script>
+// 导入dayjs（系统依赖包，自动去node_modules下边获取）
+import dayjs from 'dayjs'
+
 // 用户资料api
 import { apiUserProfile } from '@/api/user.js'
 export default {
@@ -106,10 +119,16 @@ export default {
     // 时间选择器，确认选取时间了
     // val:就是选定好的时间
     onConfirm (val) {
-      console.log(val) // Fri Mar 10 2017 00:00:00 GMT+0800 (中国标准时间)
-      console.log(typeof val) // object
+      // console.log(val) // Fri Mar 10 2017 00:00:00 GMT+0800 (中国标准时间)
+      // console.log(typeof val) // object
       // 现在感觉不太对，表单中收集的时间要求是 "年-月-日" 格式化样子，而我们拥有的是对象格式
       // 暂时 表单 还不能直接收集 生日信息，需要转化
+      // 通过dayjs把val变为 "年-月-日" 格式，并赋值 表单生日项目
+      // console.log(dayjs(val)) // dayjs对象
+      this.userprofile.birthday = dayjs(val).format('YYYY-MM-DD')
+
+      // 关闭弹出层
+      this.showBirthday = false
     },
     // 性别 上拉菜单 选中项目 的回调处理
     // val: 代表被选中项目的对象数据

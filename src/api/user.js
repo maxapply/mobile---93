@@ -3,6 +3,20 @@
 import request from '@/utils/request.js'
 
 /**
+ * 对用户头像进行更新
+ * patch：代表对众多的字段中"几个"来更新
+ * put: 对"全部"字段做更新
+ * @param {FormData对象，里边有附件信息，photo代表头像} fdObj
+ */
+export function apiUserPhoto (fdObj) {
+  return request({
+    url: '/app/v1_0/user/photo',
+    method: 'PATCH',
+    data: fdObj
+  })
+}
+
+/**
  * 编辑资料：获得用户的资料信息，用于修改
  * 内部自动传递token，可以识别当前的用户
  */
