@@ -55,13 +55,15 @@
         v-model="currentDate" 默认显示时间
         :min-date 最小选取时间范围 1900年
         :max-date 最大选取时间范围 当前时间
-        注意：当前各个时间类型都是  new Date() 对象格式
+        注意：当前各个时间类型都是  new Date() 对象格式，时间选择器要求的
+        @confirm="onConfirm" 单击确认按钮后的回调处理，可以获得选中的时间信息，注意不要设置()
       -->
       <van-datetime-picker
         v-model="currentDate"
         type="date"
         :min-date="minDate"
         :max-date="maxDate"
+        @confirm="onConfirm"
       />
     </van-popup>
   </div>
@@ -101,6 +103,14 @@ export default {
     this.getUserProfile()
   },
   methods: {
+    // 时间选择器，确认选取时间了
+    // val:就是选定好的时间
+    onConfirm (val) {
+      console.log(val) // Fri Mar 10 2017 00:00:00 GMT+0800 (中国标准时间)
+      console.log(typeof val) // object
+      // 现在感觉不太对，表单中收集的时间要求是 "年-月-日" 格式化样子，而我们拥有的是对象格式
+      // 暂时 表单 还不能直接收集 生日信息，需要转化
+    },
     // 性别 上拉菜单 选中项目 的回调处理
     // val: 代表被选中项目的对象数据
     onSelect (val) {
