@@ -130,7 +130,15 @@ export default {
       fd.append('photo', fobj) // photo 是接口文章要求的参数名称
 
       // 3. 把FormData给到api函数，提交给服务器端
-      await apiUserPhoto(fd)
+      const result = await apiUserPhoto(fd)
+
+      // 把服务器端上传好并返回的头像信息更新显示到页面上
+      // 本质给到userprofile.photo
+      this.userprofile.photo = result.photo
+      // 关闭弹出
+      this.showPhoto = false
+      // 成功提示
+      this.$toast.success('头像更新成功！')
     },
 
     // 时间选择器，确认选取时间了
