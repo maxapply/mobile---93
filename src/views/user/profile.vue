@@ -37,7 +37,7 @@
       ref和id 方式获得的元素对象本质完全一样
       上传表单域自带click，不用声明
     -->
-    <input type="file" ref="mypic" id="pic" style="display:none;" />
+    <input type="file" ref="mypic" id="pic" @change="startUpload()" style="display:none;" />
 
     <!-- 名称弹出层
         高度不配置，通过内容自动填充
@@ -83,8 +83,8 @@
 // 导入dayjs（系统依赖包，自动去node_modules下边获取）
 import dayjs from 'dayjs'
 
-// 用户资料api
-import { apiUserProfile } from '@/api/user.js'
+// 用户资料api、上传用户头像
+import { apiUserProfile, apiUserPhoto } from '@/api/user.js'
 export default {
   name: 'user-profile',
   data () {
@@ -116,6 +116,23 @@ export default {
     this.getUserProfile()
   },
   methods: {
+    // 开始上传头像
+    // 头像图片选取好了，该函数会自动触发执行
+    async startUpload () {
+      // console.dir() 可以输出元素对象的各个子成员
+      // console.dir(this.$refs.mypic) // 输出上传文件域对象
+      // 1. 获得上传好的图片对象
+      const fobj = this.$refs.mypic.files[0]
+
+      // 2. 把图片对象 整合到FormData
+      const fd = new FormData()
+      // fd整合fobj，调用append方法，不断给自己添加信息
+      fd.append('photo', fobj) // photo 是接口文章要求的参数名称
+
+      // 3. 把FormData给到api函数，提交给服务器端
+      await apiUserPhoto(fd)
+    },
+
     // 时间选择器，确认选取时间了
     // val:就是选定好的时间
     onConfirm (val) {
