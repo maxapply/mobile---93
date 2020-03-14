@@ -1,63 +1,69 @@
 <template>
   <div class="page-user-profile">
-    <van-nav-bar
-                 left-arrow
-                 @click-left="$router.back()"
-                 title="编辑资料"
-                 right-text="保存"></van-nav-bar>
-      <!-- 绘制 头像、名称、性别、生日 的单元格 -->
-      <van-cell-group>
-        <!--
+    <van-nav-bar left-arrow @click-left="$router.back()" title="编辑资料" right-text="保存"></van-nav-bar>
+    <!-- 绘制 头像、名称、性别、生日 的单元格 -->
+    <van-cell-group>
+      <!--
           center：使得单元格内容垂直方向居中显示
-        -->
-        <van-cell title="头像" is-link center @click="showPhoto=true">
-          <!--
+      -->
+      <van-cell title="头像" is-link center @click="showPhoto=true">
+        <!--
             单元格可以通过命名插槽对各个位置进行填充
             具体要表现头像 slot="default" 定义value右侧单元格内容
-          -->
-          <!--
+        -->
+        <!--
             round 使得图片变为圆形
             fit="cover" 对图片做适应 保持宽高缩放图片，使图片的“短边”能完全显示出来，裁剪“长边”
-          -->
-          <van-image
-            slot="default"
-            width="50"
-            height="50"
-            fit="cover"
-            round
-            :src="userprofile.photo"
-          ></van-image>
-        </van-cell>
-        <van-cell title="名称" is-link :value="userprofile.name" @click="showName=true"></van-cell>
-        <van-cell title="性别" is-link :value="userprofile.gender===0?'男':'女'" @click="showSex=true"></van-cell>
-        <van-cell title="生日" is-link :value="userprofile.birthday"></van-cell>
-      </van-cell-group>
-
-      <!-- 头像弹出层
-        高度不配置，通过内容自动填充
-      -->
-      <van-popup v-model="showPhoto" position="bottom">
-        <van-cell title="本地相册选择图片" is-link></van-cell>
-        <van-cell title="拍照" is-link></van-cell>
-      </van-popup>
-
-      <!-- 名称弹出层
-        高度不配置，通过内容自动填充
-      -->
-      <van-popup v-model="showName" position="bottom" style="height:20%">
-        <!-- 通过v-model把当前用户真实的名字表现出来
-          .trim ： 自动去除左右空格
         -->
-        <van-field v-model.trim="userprofile.name" type="text"></van-field>
-      </van-popup>
+        <van-image slot="default" width="50" height="50" fit="cover" round :src="userprofile.photo"></van-image>
+      </van-cell>
+      <van-cell title="名称" is-link :value="userprofile.name" @click="showName=true"></van-cell>
+      <van-cell title="性别" is-link :value="userprofile.gender===0?'男':'女'" @click="showSex=true"></van-cell>
+      <van-cell title="生日" is-link :value="userprofile.birthday" @click="showBirthday=true"></van-cell>
+    </van-cell-group>
 
-      <!-- 性别弹出层(上拉菜单)
+    <!-- 头像弹出层
+        高度不配置，通过内容自动填充
+    -->
+    <van-popup v-model="showPhoto" position="bottom">
+      <van-cell title="本地相册选择图片" is-link></van-cell>
+      <van-cell title="拍照" is-link></van-cell>
+    </van-popup>
+
+    <!-- 名称弹出层
+        高度不配置，通过内容自动填充
+    -->
+    <van-popup v-model="showName" position="bottom" style="height:20%">
+      <!-- 通过v-model把当前用户真实的名字表现出来
+          .trim ： 自动去除左右空格
+      -->
+      <van-field v-model.trim="userprofile.name" type="text"></van-field>
+    </van-popup>
+
+    <!-- 性别弹出层(上拉菜单)
         v-model="showSex" 设置弹层是否显示
         :actions="sexMenus" 设定上拉菜单项目的
         @select="onSelect" 单击到某一个菜单项目后的回调处理：收起菜单，选中项目
         cancel-text="取消" 设置有取消按钮提示
+    -->
+    <van-action-sheet v-model="showSex" :actions="sexMenus" @select="onSelect" cancel-text="取消"/>
+
+    <!-- 生日弹出层(弹出层+时间选择器) -->
+    <van-popup v-model="showBirthday" position="bottom">
+      <!-- 时间选择器
+        type="date" ‘年月日’类型选择
+        v-model="currentDate" 默认显示时间
+        :min-date 最小选取时间范围 1900年
+        :max-date 最大选取时间范围 当前时间
+        注意：当前各个时间类型都是  new Date() 对象格式
       -->
-      <van-action-sheet v-model="showSex" :actions="sexMenus" @select="onSelect" cancel-text="取消"/>
+      <van-datetime-picker
+        v-model="currentDate"
+        type="date"
+        :min-date="minDate"
+        :max-date="maxDate"
+      />
+    </van-popup>
   </div>
 </template>
 
@@ -68,11 +74,13 @@ export default {
   name: 'user-profile',
   data () {
     return {
+      // 生日选择器相关成员
+      showBirthday: false, // 弹出开关
+      currentDate: new Date(), // 当前默认显示时间
+      minDate: new Date(1900, 0, 1), // 最小选取时间限制（月份是从0开始）
+      maxDate: new Date(2100, 0, 1), // 最大选取时间限制
       // 给性别上拉菜单 配置选取项目，语法结构固定，name属性固定
-      sexMenus: [
-        { name: '男' },
-        { name: '女' }
-      ],
+      sexMenus: [{ name: '男' }, { name: '女' }],
       showSex: false, // 名称菜单层显示开关
       showName: false, // 名称弹出层显示开关
       showPhoto: false, // 头像弹出层显示开关
