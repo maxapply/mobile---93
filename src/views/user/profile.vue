@@ -10,7 +10,7 @@
         <!--
           center：使得单元格内容垂直方向居中显示
         -->
-        <van-cell title="头像" is-link center>
+        <van-cell title="头像" is-link center @click="showPhoto=true">
           <!--
             单元格可以通过命名插槽对各个位置进行填充
             具体要表现头像 slot="default" 定义value右侧单元格内容
@@ -32,6 +32,14 @@
         <van-cell title="性别" is-link :value="userprofile.gender===0?'男':'女'"></van-cell>
         <van-cell title="生日" is-link :value="userprofile.birthday"></van-cell>
       </van-cell-group>
+
+      <!-- 头像弹出层
+        高度不配置，通过内容自动填充
+      -->
+      <van-popup v-model="showPhoto" position="bottom">
+        <van-cell title="本地相册选择图片" is-link></van-cell>
+        <van-cell title="拍照" is-link></van-cell>
+      </van-popup>
   </div>
 </template>
 
@@ -42,6 +50,7 @@ export default {
   name: 'user-profile',
   data () {
     return {
+      showPhoto: false, // 头像弹出层显示开关
       // 用户资料的对象成员
       /**
           ├─ id integer 必须  用户id
