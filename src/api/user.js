@@ -3,6 +3,17 @@
 import request from '@/utils/request.js'
 
 /**
+ * 编辑资料：获得用户的资料信息，用于修改
+ * 内部自动传递token，可以识别当前的用户
+ */
+export function apiUserProfile () {
+  return request({
+    url: '/app/v1_0/user/profile',
+    method: 'get'
+  })
+}
+
+/**
  * 个人中心：获得用户基本信息
  */
 export function apiUserInfo () {
