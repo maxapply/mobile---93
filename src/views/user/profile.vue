@@ -25,19 +25,45 @@
             height="50"
             fit="cover"
             round
-            src="https://img.yzcdn.cn/vant/cat.jpeg"
+            :src="userprofile.photo"
           ></van-image>
         </van-cell>
-        <van-cell title="名称" is-link value="蜡笔大新"></van-cell>
-        <van-cell title="性别" is-link value="女"></van-cell>
-        <van-cell title="生日" is-link value="2018-03-09"></van-cell>
+        <van-cell title="名称" is-link :value="userprofile.name"></van-cell>
+        <van-cell title="性别" is-link :value="userprofile.gender===0?'男':'女'"></van-cell>
+        <van-cell title="生日" is-link :value="userprofile.birthday"></van-cell>
       </van-cell-group>
   </div>
 </template>
 
 <script>
+// 用户资料api
+import { apiUserProfile } from '@/api/user.js'
 export default {
-  name: 'user-profile'
+  name: 'user-profile',
+  data () {
+    return {
+      // 用户资料的对象成员
+      /**
+          ├─ id integer 必须  用户id
+          ├─ name string 必须  用户名
+          ├─ photo string 必须  头像
+          ├─ mobile string 必须  手机号
+          ├─ gender integer 必须  性别，0-男，1-女
+          ├─ birthday string 必须  生日，格式 '2018-12-20'
+       */
+      userprofile: {}
+    }
+  },
+  created () {
+    this.getUserProfile()
+  },
+  methods: {
+    // 获得资料
+    async getUserProfile () {
+      // data直接接收数据
+      this.userprofile = await apiUserProfile()
+    }
+  }
 }
 </script>
 
