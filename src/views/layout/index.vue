@@ -11,8 +11,13 @@
       个人中心路由地址：/user
       判断当前路由不等于/user   才显示
     -->
-    <van-nav-bar fixed title="黑马头条" right-text="搜索"
-      @click-right="$router.push('/search')" v-if="$route.path!=='/user'"/>
+    <van-nav-bar
+      fixed
+      title="黑马头条"
+      right-text="搜索"
+      @click-right="$router.push('/search')"
+      v-if="$route.path!=='/user'"
+    />
 
     <!-- 如果现在是个人中心，这my-wrapper的向上内边距要清除 -->
     <!-- <div class="my-wrapper" :style="{'padding-top':$route.path==='/user'?0:'46px'}"> -->
@@ -23,7 +28,10 @@
     -->
     <div class="my-wrapper" :class="{noTop:$route.path==='/user'}">
       <!--路由占位符，用于显示 home、question、video、user的组件的-->
-      <router-view></router-view>
+      <!-- 通过keep-alive对路由占位符进行缓存，本质缓存的是内部的各个组件 -->
+      <keep-alive>
+        <router-view></router-view>
+      </keep-alive>
     </div>
 
     <!-- 公共脚步
@@ -35,11 +43,12 @@
     -->
     <van-tabbar route>
       <van-tabbar-item to="/home" icon="home-o">首页</van-tabbar-item>
-      <van-tabbar-item to="/question"  icon="chat-o">问答</van-tabbar-item>
-      <van-tabbar-item to="/video"  icon="video-o">视频</van-tabbar-item>
-      <van-tabbar-item :to="$store.state.user.token?'/user':'/login'"  icon="user-o">
-        {{$store.state.user.token?'我的':'未登录'}}
-      </van-tabbar-item>
+      <van-tabbar-item to="/question" icon="chat-o">问答</van-tabbar-item>
+      <van-tabbar-item to="/video" icon="video-o">视频</van-tabbar-item>
+      <van-tabbar-item
+        :to="$store.state.user.token?'/user':'/login'"
+        icon="user-o"
+      >{{$store.state.user.token?'我的':'未登录'}}</van-tabbar-item>
     </van-tabbar>
   </div>
 </template>
@@ -53,11 +62,11 @@ export default {
 </script>
 
 <style scoped lang='less'>
-.container{
+.container {
   width: 100%;
   height: 100%;
   position: relative;
-  .my-wrapper{
+  .my-wrapper {
     width: 100%;
     height: 100%;
     overflow: hidden;
@@ -65,7 +74,7 @@ export default {
     padding-bottom: 100px;
     box-sizing: border-box;
     // noTop专门给个人中心用的，使得主内容没有线上的边距
-    &.noTop{
+    &.noTop {
       padding-top: 0;
     }
   }
