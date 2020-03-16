@@ -19,7 +19,7 @@
     <!--发表聊天内容的表单构件-->
     <div class="reply-container van-hairline--top">
       <van-field v-model.trim="content" placeholder="说点什么...">
-        <van-button size="mini" :loading="isloading" slot="button">提交</van-button>
+        <van-button size="mini" :loading="isloading" @click="send()" slot="button">提交</van-button>
       </van-field>
     </div>
 
@@ -40,6 +40,7 @@ export default {
   data () {
     return {
       // msg 和 timestamp 是服务器端要求的名字，发送和接收的数据都遵守
+      // name是自定义成员，请注意维护
       // [
       //  {msg:'用户消息',timestamp:时间,name:'vip'},
       //  {msg:'机器人消息',timestamp:时间,name:'xz'},
@@ -61,6 +62,25 @@ export default {
     this.setSocket()
   },
   methods: {
+    // 用户 对 小智 说话
+    send () {
+      // 没有数据，不给发送
+      if (!this.content) { return false }
+      console.log(123)
+      // 把聊天内容先存储给talks
+      const args = {
+        msg: this.content,
+        timestamp: Date.now(),
+        name: 'vip'
+      }
+      this.talks.push(args)
+
+      // 把聊天内容发送给服务器端,利用socket
+      // this.socket.emit('服务器端事件名称',传递的数据)
+      // 注意：args是一个拥有3个成员的对象，可不是单纯的聊天内容
+      this.socket.emit('message', args)
+    },
+
     // 建立socket连接
     setSocket () {
       // 客户端 向 服务器端 发请求，建立连接
@@ -70,13 +90,23 @@ export default {
       // 创建事件，感知连接状态,connect是固定标志
       this.socket.on('connect', () => {
         console.log('连接成功')
+
+        // 连接成功让"小智同学"主动发起对话，即给talks里边添加一个记录
+        this.talks.push({
+          msg: 'outman,最近干啥呢？',
+          timestamp: Date.now(),
+          name: 'xz'
+        })
       })
 
-      // 服务器端 向 客户端 发送聊天信息
+      // 服务器端 向 客户端 发送回复聊天信息
       // message 是 服务器端 已经声明好的名字，是固定的，代表事件名称
-      this.socket.on('message', (content) => {
+      this.socket.on('message', (back) => {
         // 回来的消息格式为：{msg:机器人回复内容,timestamp:回复时间}
-        console.log(content)
+        // console.log(content)
+        // 把content存储到talks成员里边
+        // this.talks.push({ msg:机器人回复内容,timestamp:回复时间, name: 'xz' })
+        this.talks.push({ ...back, name: 'xz' })
       })
     },
     // 获取用户信息
