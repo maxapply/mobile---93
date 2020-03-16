@@ -4,21 +4,34 @@
 
     <!-- 聊天区域 -->
     <div class="chat-list">
-      <!-- 小智同学 -->
-      <div class="chat-item left">
+      <!-- 小智同学/用户 聊天项目 -->
+      <!-- <div class="chat-item left">
         <van-image fit="cover" round :src="XzImg"/>
         <div class="chat-pao">干啥呢，河蟹</div>
       </div>
-      <!-- 用户 -->
       <div class="chat-item right">
         <div class="chat-pao">没看正忙，挖沙呢</div>
         <van-image fit="cover" round :src="userinfo.photo"/>
+      </div> -->
+
+      <div
+        class="chat-item"
+        v-for="(item,k) in talks"
+        :key="k"
+        :class="item.name==='xz'?'left':'right'">
+        <van-image fit="cover" round v-if="item.name==='xz'" :src="XzImg"/>
+        <div class="chat-pao">{{item.msg}}</div>
+        <van-image fit="cover" round v-if="item.name==='vip'" :src="userinfo.photo"/>
       </div>
+
     </div>
 
     <!--发表聊天内容的表单构件-->
     <div class="reply-container van-hairline--top">
-      <van-field v-model.trim="content" placeholder="说点什么...">
+      <!-- 给输入框设置@keyup.enter事件，使得回车键 触碰也会完成发表信息的功能
+        enter是事件修饰符，明确只有"回车键"可以触发该事件
+      -->
+      <van-field v-model.trim="content" placeholder="说点什么..." @keyup.enter="send()">
         <van-button size="mini" :loading="isloading" @click="send()" slot="button">提交</van-button>
       </van-field>
     </div>
@@ -63,10 +76,12 @@ export default {
   },
   methods: {
     // 用户 对 小智 说话
-    send () {
+    async send () {
+      // 按钮等待效果
+      this.isloading = true
+
       // 没有数据，不给发送
       if (!this.content) { return false }
-      console.log(123)
       // 把聊天内容先存储给talks
       const args = {
         msg: this.content,
@@ -75,16 +90,33 @@ export default {
       }
       this.talks.push(args)
 
+      // 延迟0.5秒,在该位置的用意：用户数据立即展示到页面上，而机器人数据等待0.5s后展示
+      await this.$sleep(500)
+
       // 把聊天内容发送给服务器端,利用socket
       // this.socket.emit('服务器端事件名称',传递的数据)
       // 注意：args是一个拥有3个成员的对象，可不是单纯的聊天内容
       this.socket.emit('message', args)
+
+      // 把已经发送好的消息，在文本框中清除
+      this.content = ''
+
+      // 按钮等待状态恢复
+      this.isloading = false
     },
 
     // 建立socket连接
     setSocket () {
       // 客户端 向 服务器端 发请求，建立连接
-      this.socket = io('http://ttapi.research.itcast.cn') // socket.io连接
+      // this.socket = io(服务端地址,参数) // socket.io连接
+      this.socket = io('http://ttapi.research.itcast.cn', {
+        query: {
+          token: this.$store.state.user.token
+        }
+        // autoConnect: false
+      }) // socket.io连接 http://ttapi.research.itcast.cn?token=xxx
+
+      // this.socket.connect()
 
       // 服务器端连接成功，向 客户端 发请求告知
       // 创建事件，感知连接状态,connect是固定标志
@@ -103,7 +135,7 @@ export default {
       // message 是 服务器端 已经声明好的名字，是固定的，代表事件名称
       this.socket.on('message', (back) => {
         // 回来的消息格式为：{msg:机器人回复内容,timestamp:回复时间}
-        // console.log(content)
+        // console.log(back)
         // 把content存储到talks成员里边
         // this.talks.push({ msg:机器人回复内容,timestamp:回复时间, name: 'xz' })
         this.talks.push({ ...back, name: 'xz' })
