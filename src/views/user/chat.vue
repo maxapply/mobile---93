@@ -2,8 +2,10 @@
   <div class="container">
     <van-nav-bar fixed left-arrow @click-left="$router.back()" title="小智同学"></van-nav-bar>
 
-    <!-- 聊天区域 -->
-    <div class="chat-list">
+    <!-- 聊天区域
+      this.$refs.talkArea 获得如下div的dom对象
+    -->
+    <div class="chat-list" ref="talkArea">
       <!-- 小智同学/用户 聊天项目 -->
       <!-- <div class="chat-item left">
         <van-image fit="cover" round :src="XzImg"/>
@@ -74,14 +76,39 @@ export default {
     // socket.io连接初始化配置，页面加载完毕，连接就配置完成
     this.setSocket()
   },
+  beforeDestroy () {
+    // 组件不使用了，离开聊天室，要关闭socket.io
+    // 节省资源
+    this.socket.close()
+  },
   methods: {
+    // 使得 聊天区域 的滚动条始终在最下边显示
+    scrollBottom () {
+      // 通过算法，使得滚动条跑到最下边
+      // this.$refs.talkArea.scrollHeight // 代表元素区域中高度，包括滚动条
+
+      // 滚动条卷起的告诉
+      // 当前元素区域 "窗口顶部" 达到 "元素本身顶部" 的距离
+      // this.$refs.talkArea.scrollTop
+
+      // 滚动条最底部设置：scrollTop 等于  scrollHeight-窗口高度  [理论]
+      // scrollTop 等于  scrollHeight 也可以完成这样效果 [实际操作，简便]
+
+      // this.$nextTick可以保证data数据变化并完成页面更新的响应式动作后 再做一些其他逻辑
+      // 本身是Vue技术
+      this.$nextTick(() => {
+        this.$refs.talkArea.scrollTop = this.$refs.talkArea.scrollHeight
+      })
+    },
+
     // 用户 对 小智 说话
     async send () {
+      // 没有数据，不给发送
+      if (!this.content) { return false }
+
       // 按钮等待效果
       this.isloading = true
 
-      // 没有数据，不给发送
-      if (!this.content) { return false }
       // 把聊天内容先存储给talks
       const args = {
         msg: this.content,
@@ -90,6 +117,18 @@ export default {
       }
       this.talks.push(args)
 
+      // talks数据更新执行逻辑：数据追加--->滚动条滚动--->(响应式)页面更新
+      // 上述过程导致最新的数据不会显示，滚动条底部滚动不彻底
+
+      // 怎么样彻底：
+      // talks数据更新：数据追加--->(响应式)页面更新--->滚动条滚动
+
+      // 滚动条滚动到最下边
+      this.scrollBottom()
+
+      // 把已经发送好的消息，在文本框中清除
+      this.content = ''
+
       // 延迟0.5秒,在该位置的用意：用户数据立即展示到页面上，而机器人数据等待0.5s后展示
       await this.$sleep(500)
 
@@ -97,9 +136,6 @@ export default {
       // this.socket.emit('服务器端事件名称',传递的数据)
       // 注意：args是一个拥有3个成员的对象，可不是单纯的聊天内容
       this.socket.emit('message', args)
-
-      // 把已经发送好的消息，在文本框中清除
-      this.content = ''
 
       // 按钮等待状态恢复
       this.isloading = false
@@ -139,6 +175,7 @@ export default {
         // 把content存储到talks成员里边
         // this.talks.push({ msg:机器人回复内容,timestamp:回复时间, name: 'xz' })
         this.talks.push({ ...back, name: 'xz' })
+        this.scrollBottom() // 滚动条滚动底部
       })
     },
     // 获取用户信息
