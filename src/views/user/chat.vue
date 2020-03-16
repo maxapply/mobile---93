@@ -6,13 +6,13 @@
     <div class="chat-list">
       <!-- 小智同学 -->
       <div class="chat-item left">
-        <van-image fit="cover" round src="https://img.yzcdn.cn/vant/cat.jpeg"/>
+        <van-image fit="cover" round :src="XzImg"/>
         <div class="chat-pao">干啥呢，河蟹</div>
       </div>
       <!-- 用户 -->
       <div class="chat-item right">
         <div class="chat-pao">没看正忙，挖沙呢</div>
-        <van-image fit="cover" round src="https://img.yzcdn.cn/vant/cat.jpeg"/>
+        <van-image fit="cover" round :src="userinfo.photo"/>
       </div>
     </div>
 
@@ -27,12 +27,61 @@
 </template>
 
 <script>
+// 导入socket.io-client
+import io from 'socket.io-client'
+
+// 用户基本信息api
+import { apiUserInfo } from '@/api/user.js'
+// 导入小智头像
+import XzImg from '@/assets/img/xz.png'
+
 export default {
   name: 'user-chat',
   data () {
     return {
+      // msg 和 timestamp 是服务器端要求的名字，发送和接收的数据都遵守
+      // [
+      //  {msg:'用户消息',timestamp:时间,name:'vip'},
+      //  {msg:'机器人消息',timestamp:时间,name:'xz'},
+      //  {msg:'用户消息',timestamp:时间,name:'vip'},
+      //  {msg:'机器人消息',timestamp:时间,name:'xz'},
+      // ]
+      talks: [], // 全部的聊天内容(用户和机器人的)
+      socket: null, // socket.io连接对象，本身不在模板中使用，可以通过null做初始化
+
+      userinfo: {}, // 用户基本信息，使用{}声明空对象，不要使用null，因为其要在模板中应用
+      XzImg, // 对象简易成员赋值接收 变量， XzImg:XzImg
       content: '', // 发表的聊天内容
       isloading: false // 提交聊天加载动画
+    }
+  },
+  created () {
+    this.getUserInfo()
+    // socket.io连接初始化配置，页面加载完毕，连接就配置完成
+    this.setSocket()
+  },
+  methods: {
+    // 建立socket连接
+    setSocket () {
+      // 客户端 向 服务器端 发请求，建立连接
+      this.socket = io('http://ttapi.research.itcast.cn') // socket.io连接
+
+      // 服务器端连接成功，向 客户端 发请求告知
+      // 创建事件，感知连接状态,connect是固定标志
+      this.socket.on('connect', () => {
+        console.log('连接成功')
+      })
+
+      // 服务器端 向 客户端 发送聊天信息
+      // message 是 服务器端 已经声明好的名字，是固定的，代表事件名称
+      this.socket.on('message', (content) => {
+        // 回来的消息格式为：{msg:机器人回复内容,timestamp:回复时间}
+        console.log(content)
+      })
+    },
+    // 获取用户信息
+    async getUserInfo () {
+      this.userinfo = await apiUserInfo()
     }
   }
 }
