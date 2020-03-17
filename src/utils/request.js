@@ -102,7 +102,13 @@ instance.interceptors.response.use(function (response) {
       token: result.data.data.token,
       refresh_token: store.state.user.refresh_token
     })
-    return false
+
+    // 把刚刚401失败的请求再重新发送一次
+    // error.config：拥有失败请求的相关信息 {url,method,data等等}
+    // 该信息正好可以满足axios应用
+    // console.dir(error)  // {url,method,data等等}
+    // instance是拥有许多配置信息的axios对象
+    return instance(error.config)
 
     // token不ok(token在服务器端已经失效了，2个小时时效)
     // 强制用户重新登录系统，以刷新服务器端的token时效
