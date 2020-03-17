@@ -12,6 +12,9 @@
         </div>
         <!-- 注意：关注和取消关注 通过一个click事件触发执行 -->
         <van-button round size="small" type="info" @click="followMe()" :loading="followLoading">{{article.is_followed?'取消关注':'+ 关注'}}</van-button>
+
+        <van-button @click="$store.commit('clearToken')">模拟删除token</van-button>
+
       </div>
       <div class="content">
         <p v-html="article.content"></p>

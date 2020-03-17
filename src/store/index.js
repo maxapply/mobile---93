@@ -26,6 +26,15 @@ export default new Vuex.Store({
       state.user = {}
       // 2. localStorage做持久清除
       localStorage.removeItem(USER_KEY)
+    },
+    // 清除token，模拟2小时过期
+    clearToken (state) {
+      // delete 可以删除对象的成员属性
+      // var obj = {name:'tom',leg:2}
+      // delete obj.name  // 对name成员属性删除
+      // console.log(obj)  // {leg:2}
+
+      delete state.user.token
     }
   },
   actions: {

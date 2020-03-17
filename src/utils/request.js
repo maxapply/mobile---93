@@ -73,10 +73,37 @@ instance.interceptors.response.use(function (response) {
   } catch (err) {
     return response.data
   }
-}, function (error) {
+}, async function (error) {
   // 非正常响应处理(包括401)
   // console.dir(error) // 对象： config request response isAxiosError toJSON
   if (error.response.status === 401) {
+    // refresh_token去营救token
+    // 1. 判断refresh_token如果也没有，强制登录
+    if (!store.state.user.refresh_token) {
+      router.push('/login')
+      // return 停止后续代码执行
+      return new Promise(function () {}) // 返回空壳的对象，不要报任何错误
+    }
+    // 2. refresh_token存在，就携带者，发送新的axios请求，去营救token
+    const result = await axios({
+      url: 'http://ttapi.research.itcast.cn/app/v1_0/authorizations',
+      method: 'put',
+      // 配置请求头信息
+      headers: {
+        // 配置refresh_token
+        Authorization: 'Bearer ' + store.state.user.refresh_token
+      }
+    })
+
+    // 注意：服务器端没有返回refresh_token，还使用当前的
+    // console.log(result)/  / 营救好的token  result.data.data.token
+    // 客户端对新的token进行维护，vuex维护，token和refresh_token必须同时维护
+    store.commit('updateUser', {
+      token: result.data.data.token,
+      refresh_token: store.state.user.refresh_token
+    })
+    return false
+
     // token不ok(token在服务器端已经失效了，2个小时时效)
     // 强制用户重新登录系统，以刷新服务器端的token时效
     router.push('/login')
